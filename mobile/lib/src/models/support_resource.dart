@@ -9,6 +9,7 @@ class SupportResource {
     required this.websiteUrl,
     required this.locationLabel,
     required this.sourceUrl,
+    this.lastVerifiedAt,
   });
 
   final String id;
@@ -21,6 +22,9 @@ class SupportResource {
   final String locationLabel;
   final String sourceUrl;
 
+  /// When HATUA staff last checked this resource against its source (from the API).
+  final DateTime? lastVerifiedAt;
+
   factory SupportResource.fromJson(Map<String, dynamic> json) => SupportResource(
         id: json['id'].toString(),
         name: json['name']?.toString() ?? '',
@@ -31,5 +35,6 @@ class SupportResource {
         websiteUrl: json['website_url']?.toString() ?? '',
         locationLabel: json['location_label']?.toString() ?? '',
         sourceUrl: json['source_url']?.toString() ?? '',
+        lastVerifiedAt: DateTime.tryParse(json['last_verified_at']?.toString() ?? ''),
       );
 }

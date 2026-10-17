@@ -1,0 +1,7 @@
+# gen-l10n config. Generated Dart lives next to the ARB files and is committed;
+# CI regenerates it and fails if it differs (keeps ARB and code in sync).
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false

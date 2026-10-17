@@ -1,25 +1,22 @@
-# Publish this Git repo to GitHub
+# GitHub setup
 
-**GitHub account verified through connected GitHub:** `MadScie254`.
+**Repository:** https://github.com/MadScie254/hatua (created by the owner on 2026-10-18).
 
-The GitHub connector available during bootstrap could inspect and edit existing repositories but did not expose a create-repository operation. No remote repository was created. The included `.git/` history is a genuine local repository and can be pushed once you create the destination.
+- Default branch `main`. Work lands through pull requests from `claude/*` or feature branches.
+- GitHub currently reports the repository as **public**. The README asks for private until privacy, branding and licensing are settled. The owner should decide: Settings → General → Danger Zone → Change visibility.
+- No licence file yet (all rights reserved).
 
-## Quick route (recommended, private repo)
+## GitHub Actions
 
-1. Visit `https://github.com/new` while signed into `MadScie254`.
-2. Set repository name to `hatua`, visibility **Private**. Do NOT initialise with README, Gitignore or license, because this package already contains files and Git history.
-3. Download/extract the HATUA source archive and open a terminal inside the `hatua` folder.
-4. Run:
+Workflows: `.github/workflows/backend.yml`, `.github/workflows/flutter.yml` (see `docs/BUILD_GUIDE.md`).
 
-```bash
-git remote add origin https://github.com/MadScie254/hatua.git
-git branch -M main
-git push -u origin main
-```
+On 2026-10-18 the first runs were refused with *"The job was not started because your account is locked due to a billing issue."* Resolve this under GitHub Settings → Billing and plans, then re-run the checks from the pull request.
 
-Authentication: use GitHub's current recommended login flow or credential manager. Do NOT paste a Personal Access Token into this repository or an AI chat. If you use SSH instead, set an SSH remote you own.
+Suggested branch protection on `main` once CI runs: require the `test`, `analyze-test` and `build-debug-apk` checks, and require a pull request before merging.
 
-Once the repository exists, connected GitHub tools and Claude/GitHub integrations can operate on it subject to app permissions.
+## Authentication
+
+Use GitHub's recommended login flow or credential manager. Never paste a Personal Access Token into this repository or an AI chat.
 
 ## Sanity checks
 
@@ -28,5 +25,3 @@ git status --short
 git log -1 --oneline
 git remote -v
 ```
-
-Expected `git status --short`: empty after the initial commit. Push actions are NOT performed by this package.

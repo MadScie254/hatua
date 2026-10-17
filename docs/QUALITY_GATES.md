@@ -2,25 +2,25 @@
 
 ## Build and automated checks
 
-- [ ] Backend dependency install succeeds.
-- [ ] `python manage.py migrate` succeeds on new database.
-- [ ] `python manage.py makemigrations --check --dry-run` shows no pending changes.
-- [ ] `python manage.py test` passes.
-- [ ] `python manage.py check --deploy` reviewed with production env.
-- [ ] `ruff check .` passes.
-- [ ] Android platform generated, package ID set and tracked in Git.
-- [ ] `flutter pub get`, `flutter analyze` and `flutter test` pass.
+- [x] Backend dependency install succeeds. *(local, 2026-10-18)*
+- [x] `python manage.py migrate` succeeds on new database. *(local)*
+- [x] `python manage.py makemigrations --check --dry-run` shows no pending changes. *(local)*
+- [x] `python manage.py test` passes. *(local, 21 tests)*
+- [x] `python manage.py check --deploy` reviewed with production-like env (only W021 HSTS preload, deliberate). Re-run with the real production env.
+- [x] `ruff check .` passes. *(local)*
+- [ ] Android platform generated, package ID set and tracked in Git. *(generated and tracked; package ID still placeholder)*
+- [x] `flutter pub get`, `flutter analyze` and `flutter test` pass. *(local, 39 tests)*
 - [ ] End-to-end Android browse offline/online smoke tests pass.
 - [ ] Release APK builds with HTTPS-only production API.
 
 ## Accessibility and user trust
 
 - [ ] TalkBack navigation verified.
-- [ ] Text scales correctly to at least 200%.
+- [ ] Text scales correctly to at least 200%. *(widget tests pass at 200% on 360dp in en/sw; confirm on device)*
 - [ ] All touch targets readable and accessible.
 - [ ] English and Kiswahili content complete, reviewed by speakers.
 - [ ] Helpline and provider details manually verified on launch date.
-- [ ] Listings with expired applications are automatically excluded offline and online.
+- [x] Listings with expired applications are automatically excluded offline and online.
 - [ ] Reporting mechanism, removal escalation and human support channel operational.
 
 ## Privacy/security/safety

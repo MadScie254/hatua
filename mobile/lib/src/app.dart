@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import 'data/catalog_repository.dart';
 import 'data/local_store.dart';
+import 'l10n_helpers.dart';
 import 'screens/explore_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/plan_screen.dart';
@@ -9,116 +11,173 @@ import 'screens/settings_screen.dart';
 import 'screens/support_screen.dart';
 import 'theme/app_theme.dart';
 
-class HatuaApp extends StatelessWidget {
-  const HatuaApp({super.key});
+class HatuaApp extends StatefulWidget {
+  /// [store] and [repository] are injectable for tests; production builds create their own.
+  const HatuaApp({super.key, this.store, this.repository});
+  final LocalStore? store;
+  final CatalogRepository? repository;
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'HATUA',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        home: const _Bootstrap(),
-      );
+  State<HatuaApp> createState() => _HatuaAppState();
 }
 
-class _Bootstrap extends StatefulWidget {
-  const _Bootstrap();
-  @override
-  State<_Bootstrap> createState() => _BootstrapState();
-}
-
-class _BootstrapState extends State<_Bootstrap> {
-  final _store = LocalStore();
+class _HatuaAppState extends State<HatuaApp> {
+  late final LocalStore _store = widget.store ?? LocalStore();
+  late final CatalogRepository _repository = widget.repository ?? CatalogRepository();
   bool _ready = false;
-  String? _error;
+  bool _failed = false;
+  Locale? _locale;
 
   @override
   void initState() {
     super.initState();
+    _store.addListener(_onStoreChanged);
     _load();
+  }
+
+  void _onStoreChanged() {
+    if (_store.locale != _locale && mounted) setState(() => _locale = _store.locale);
+  }
+
+  @override
+  void dispose() {
+    _store.removeListener(_onStoreChanged);
+    if (widget.store == null) _store.dispose();
+    if (widget.repository == null) _repository.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
     try {
       await _store.load();
-      if (mounted) setState(() { _ready = true; _error = null; });
+      if (!mounted) return;
+      setState(() {
+        _ready = true;
+        _failed = false;
+      });
     } catch (_) {
-      if (mounted) setState(() => _error = 'Secure local storage could not be opened. Please retry.');
+      if (!mounted) return;
+      setState(() {
+        _ready = false;
+        _failed = true;
+      });
     }
   }
 
-  @override
-  void dispose() {
-    _store.dispose();
-    super.dispose();
+  /// Last resort when encrypted storage cannot be read (for example a Keystore key was lost):
+  /// wipe HATUA's local data so the user is not locked out of public information.
+  Future<void> _resetAndLoad() async {
+    try {
+      await _store.clearAll();
+    } catch (_) {
+      // _load() below reports the failure again if storage is still unusable.
+    }
+    await _load();
   }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.system,
+        locale: _locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: _failed
+            ? _StorageErrorScreen(onRetry: _load, onReset: _resetAndLoad)
+            : !_ready
+                ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+                : AppShell(store: _store, repository: _repository),
+      );
+}
+
+class _StorageErrorScreen extends StatelessWidget {
+  const _StorageErrorScreen({required this.onRetry, required this.onReset});
+  final VoidCallback onRetry;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
-    if (_error != null) {
-      return Scaffold(body: SafeArea(child: Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.lock_outline, size: 44),
-          Padding(padding: const EdgeInsets.all(20), child: Text(_error!, textAlign: TextAlign.center)),
-          FilledButton(onPressed: _load, child: const Text('Retry')),
-        ]),
-      )));
-    }
-    if (!_ready) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    return _AppShell(store: _store);
+    final l10n = context.l10n;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.lock_outline, size: 44),
+              const SizedBox(height: 16),
+              Text(l10n.storageErrorMessage, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: onRetry, child: Text(l10n.retry)),
+              const SizedBox(height: 8),
+              TextButton(onPressed: onReset, child: Text(l10n.storageResetAction, textAlign: TextAlign.center)),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 }
 
-class _AppShell extends StatefulWidget {
-  const _AppShell({required this.store});
+/// Bottom-navigation shell. Tabs are built on first visit so the app does not download
+/// directories the user never opens (data costs matter to HATUA's users).
+class AppShell extends StatefulWidget {
+  const AppShell({super.key, required this.store, required this.repository});
   final LocalStore store;
+  final CatalogRepository repository;
 
   @override
-  State<_AppShell> createState() => _AppShellState();
+  State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<_AppShell> {
-  final _repository = CatalogRepository();
+class _AppShellState extends State<AppShell> {
   int _selected = 0;
+  final _visited = <int>{0};
 
-  @override
-  void dispose() {
-    _repository.dispose();
-    super.dispose();
-  }
+  void _select(int index) => setState(() {
+        _selected = index;
+        _visited.add(index);
+      });
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      HomeScreen(onNavigate: (i) => setState(() => _selected = i)),
-      ExploreScreen(store: widget.store, repository: _repository),
-      SupportScreen(repository: _repository),
-      PlanScreen(store: widget.store),
-      SettingsScreen(store: widget.store),
+    final l10n = context.l10n;
+    final pages = <Widget Function()>[
+      () => HomeScreen(onNavigate: _select),
+      () => ExploreScreen(store: widget.store, repository: widget.repository),
+      () => SupportScreen(store: widget.store, repository: widget.repository),
+      () => PlanScreen(store: widget.store),
+      () => SettingsScreen(store: widget.store),
     ];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('HATUA', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            tooltip: 'Settings and privacy',
-            onPressed: () => setState(() => _selected = 4),
-            icon: const Icon(Icons.settings_outlined),
-          ),
+      appBar: AppBar(title: Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold))),
+      body: IndexedStack(
+        index: _selected,
+        children: [
+          for (var i = 0; i < pages.length; i++) _visited.contains(i) ? pages[i]() : const SizedBox.shrink(),
         ],
       ),
-      body: IndexedStack(index: _selected, children: pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selected,
-        onDestinationSelected: (i) => setState(() => _selected = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.work_outline), selectedIcon: Icon(Icons.work), label: 'Explore'),
-          NavigationDestination(icon: Icon(Icons.volunteer_activism_outlined), selectedIcon: Icon(Icons.volunteer_activism), label: 'Support'),
-          NavigationDestination(icon: Icon(Icons.flag_outlined), selectedIcon: Icon(Icons.flag), label: 'My Plan'),
-          NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'Settings'),
+        onDestinationSelected: _select,
+        destinations: [
+          NavigationDestination(
+              icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home), label: l10n.navHome),
+          NavigationDestination(
+              icon: const Icon(Icons.work_outline), selectedIcon: const Icon(Icons.work), label: l10n.navExplore),
+          NavigationDestination(
+              icon: const Icon(Icons.volunteer_activism_outlined),
+              selectedIcon: const Icon(Icons.volunteer_activism),
+              label: l10n.navSupport),
+          NavigationDestination(
+              icon: const Icon(Icons.flag_outlined), selectedIcon: const Icon(Icons.flag), label: l10n.navPlan),
+          NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.navSettings),
         ],
       ),
     );

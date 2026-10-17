@@ -6,21 +6,21 @@ Legend: **S** = starter source implemented (still uncompiled here); **P1** = pil
 |---|---|---|
 | Splash/loading | S | Basic loading; no custom splash graphics |
 | Welcome carousel | P1 | Explain purpose, skip easily |
-| Language choice | P1 | English/Kiswahili at release |
+| Language choice | S | Phone default / English / Kiswahili in Settings; Kiswahili is a reviewed-pending draft |
 | Guest / account choice | S | Guest only; registration absent by design |
 | Registration/login | P2 | Only if user benefit and legal basis clear |
 | Privacy and consent | P1 | Public policy essential; personal consent when needed |
 | Interest selection | P2 | No invasive profiling |
-| County selection | P1 | Manual; no GPS requirement |
+| County selection | S | Manual picker, 47 counties, stored on device only; no GPS |
 | Home | S | Quick actions to three journeys |
-| Opportunity categories | P1 | Category tags exist in API |
-| Search/filter | S | Client text search; server query filters exist |
+| Opportunity categories | S | Category chips; API `?category=` |
+| Search/filter | S | On-device text, county, category/kind filters; server filters exist |
 | Opportunity detail | S | Summary/card with eligibility, official links |
 | Saved opportunities | S | On-device bookmark + saved filter |
 | Application tracking | P2 | No application collection in MVP |
 | Support home | S | NACADA 1192 dialer shortcut |
-| Emergency help | P1 | Needs professional-reviewed local copy |
-| Support directory | S | Verified/inactive filters, no real entries yet |
+| Emergency help | S (copy only) | Card above the directory, offline-safe; no numbers until professionally verified |
+| Support directory | S | Kind chips, county filter, last-checked date; no real entries yet |
 | Support provider detail | S | In-card details, external contact |
 | Confidential referrals | BLOCKED | Consent architecture, provider onboarding, law |
 | Wellbeing check-in | BLOCKED | Health data and clinical safeguards |
@@ -28,7 +28,7 @@ Legend: **S** = starter source implemented (still uncompiled here); **P1** = pil
 | Goal details/subtasks | P2 | Flat goals only currently |
 | Notifications | P2 | Device permission not requested currently |
 | Profile/settings | S | Guest status, privacy copy, local data deletion |
-| Offline public info | S | 24-hour public cache; no sensitive cache |
+| Offline public info | S | 24-hour public cache, deleted after expiry, labelled with save time; distinct "unavailable" state |
 | Feedback/report listing | P1 | Moderate safely, no public accusations |
 | Private journal | BLOCKED | Requires security, safety and consent review |
 | Lessons/micro-learning | P2 | Reviewed sources and licences |
@@ -38,7 +38,7 @@ Legend: **S** = starter source implemented (still uncompiled here); **P1** = pil
 | Community events | P2 | Partner curated |
 | Partner admin portal | P2 | Internal Django Admin is NOT partner portal |
 | Caseworker referral inbox | BLOCKED | Consent, role isolation, audit required |
-| Moderation admin | S | Staff-only Django Admin models |
+| Moderation admin | S | Staff-only Admin; provenance rules, reviewer recorded, state filter, "Revoke now" |
 | AI recommendation/assistant | P2 | No clinical/health scoring |
 
 ## Interaction acceptance cases

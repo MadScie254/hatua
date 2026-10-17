@@ -35,6 +35,19 @@ jobs:
       - name: Android runner must be tracked (no silent regeneration)
         run: test -f android/app/src/main/AndroidManifest.xml
       - run: flutter pub get --enforce-lockfile
+      - name: Generated localisations match the ARB files
+        run: |
+          flutter gen-l10n
+          git diff --exit-code -- lib/l10n
+      - name: English and Kiswahili define the same strings
+        run: |
+          python3 - <<'EOF'
+          import json, sys
+          en = {k for k in json.load(open('lib/l10n/app_en.arb')) if not k.startswith('@')}
+          sw = {k for k in json.load(open('lib/l10n/app_sw.arb')) if not k.startswith('@')}
+          if en != sw:
+              sys.exit(f'missing in sw: {sorted(en - sw)}; extra in sw: {sorted(sw - en)}')
+          EOF
       - run: flutter analyze
       - run: flutter test
 
@@ -58,10 +71,19 @@ jobs:
       - run: flutter --disable-analytics
       - run: flutter pub get --enforce-lockfile
       - name: Build debug APK (compiles manifests, resources and Gradle config)
-        run: flutter build apk --debug
-      - name: Release manifest must request INTERNET and disable backup
+        run: flutter build apk --debug --target-platform android-arm64
+      - name: Build release APK (debug-signed until a release key exists)
+        run: flutter build apk --release --target-platform android-arm64 --dart-define=HATUA_API_URL=https://api.example.invalid
+      - name: Merged release manifest is locked down
         run: |
-          m=android/app/src/main/AndroidManifest.xml
-          grep -q 'android.permission.INTERNET' "$m"
-          grep -q 'android:allowBackup="false"' "$m"
-          ! grep -q 'usesCleartextTraffic="true"' "$m"
+          aapt2=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/aapt2
+          apk=build/app/outputs/flutter-apk/app-release.apk
+          tree=$("$aapt2" dump xmltree --file AndroidManifest.xml "$apk")
+          perms=$("$aapt2" dump permissions "$apk" | grep -o "name='[^']*'" | grep -v DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION | sort -u)
+          echo "$perms"
+          # Only INTERNET (plus androidx's internal signature permission filtered above).
+          test "$perms" = "name='android.permission.INTERNET'"
+          echo "$tree" | grep -q 'allowBackup(0x01010280)=false'
+          echo "$tree" | grep -q 'dataExtractionRules'
+          # The debug-only cleartext config must not leak into release.
+          ! echo "$tree" | grep -q -e 'networkSecurityConfig' -e 'usesCleartextTraffic(0x010104ec)=true'

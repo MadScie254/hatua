@@ -73,7 +73,14 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {'anon': '60/min', 'user': '600/hour'},
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
 }
-CORS_ALLOWED_ORIGINS = [s.strip() for s in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if s.strip()]
+# A verification older than this silently removes the record from the public API until staff
+# re-check the source. 90 days is a conservative starting point, not a validated figure;
+# revisit with pilot partners (see docs/CONTENT_VERIFICATION.md).
+HATUA_VERIFICATION_MAX_AGE_DAYS = int(os.getenv('HATUA_VERIFICATION_MAX_AGE_DAYS', '90'))
+if HATUA_VERIFICATION_MAX_AGE_DAYS < 1:
+    raise RuntimeError('HATUA_VERIFICATION_MAX_AGE_DAYS must be a positive number of days')
+
+CORS_ALLOWED_ORIGINS =[s.strip() for s in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if s.strip()]
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_CONTENT_TYPE_NOSNIFF = True

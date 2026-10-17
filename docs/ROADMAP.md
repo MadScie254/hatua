@@ -11,26 +11,28 @@
 - [x] Encrypted local goals, bookmarks and public offline caching authored.
 - [x] API tests and Flutter widget tests written.
 - [x] Privacy and Claude handoff documents.
-- [ ] Bootstrap real Flutter platform projects with Android SDK.
-- [ ] Install dependencies; run and pass backend/unit/Flutter tests and analyzer.
-- [ ] Verify manually authored initial Django migration against generated state.
+- [x] Bootstrap real Flutter platform projects with Android SDK (Flutter 3.47.7, runner tracked).
+- [x] Install dependencies; run and pass backend/unit/Flutter tests and analyzer (locally: 21 backend, 39 Flutter; GitHub Actions blocked by account billing lock).
+- [x] Verify manually authored initial Django migration against generated state (no changes detected).
 - [ ] Connect Android emulator/physical phone to local backend and run end-to-end smoke test.
-- [ ] Capture actual UI screenshots and accessibility observations.
-- [ ] Commit generated Android runner after checking package ID and permissions.
+- [ ] Capture actual UI screenshots and accessibility observations. (Real-font test-harness screenshots: `mobile/tool/screenshots`; device screenshots and TalkBack still to do.)
+- [x] Commit generated Android runner after checking package ID and permissions.
+- [x] Build a debug APK (arm64, local) and inspect its merged manifest.
+- [ ] Build a release APK (CI job added; local build blocked by Maven Central rate limiting).
 
 ## Phase 1: One-county trustworthy public pilot
 
 - [ ] Choose one county and 1-2 partner organisations after interviews.
 - [ ] Confirm legal/brand rights to HATUA name; choose package ID `ke.<org>.hatua` after ownership is determined.
 - [ ] Source and document official listing/provider verification for first 20 real entries.
-- [ ] Enforce source URL and verification date before admin publication.
-- [ ] Add verification expiration workflow and urgent revoke handling.
-- [ ] County filter + category filter (backend and mobile) with proper empty states.
-- [ ] Complete English + Kiswahili localisation, including emergency information.
+- [x] Enforce source URL and verification date before admin publication.
+- [x] Add verification expiration workflow and urgent revoke handling (90-day window, Admin "Revoke now"). Recheck reminders still missing.
+- [x] County filter + category filter (backend and mobile) with proper empty states.
+- [ ] Complete English + Kiswahili localisation, including emergency information. (All strings externalised; Kiswahili is a draft awaiting native-speaker and professional review.)
 - [ ] Android app icons, accessibility labels, UI tests and privacy notices.
 - [ ] Add secure, proportionate bug/scam reports without publishing private submissions.
-- [ ] Review offline cache TTL and revocation handling; do not display expired opportunities.
-- [ ] Confirm mobile HTTPS, safe URL handling, app-backup exclusions and production secrets.
+- [x] Review offline cache TTL and revocation handling; do not display expired opportunities.
+- [x] Confirm mobile HTTPS, safe URL handling, app-backup exclusions (in code/manifests; device check pending). Production secrets: n/a until deployment.
 - [ ] Complete legal/regulatory/safeguarding assessment before public beta.
 - [ ] Publish privacy policy, user contact email and deletion/support processes.
 - [ ] Run private beta with meaningful consent and manual support operations.
