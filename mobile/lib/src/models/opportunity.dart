@@ -11,6 +11,7 @@ class Opportunity {
     required this.applicationUrl,
     required this.sourceUrl,
     required this.deadline,
+    this.lastVerifiedAt,
   });
 
   final String id;
@@ -24,6 +25,17 @@ class Opportunity {
   final String applicationUrl;
   final String sourceUrl;
   final DateTime? deadline;
+
+  /// When HATUA staff last checked this listing against its source (from the API).
+  final DateTime? lastVerifiedAt;
+
+  /// Open for applications on [day] (date only). Listings without a deadline stay open.
+  bool isOpenOn(DateTime day) {
+    final d = deadline;
+    if (d == null) return true;
+    final today = DateTime(day.year, day.month, day.day);
+    return !DateTime(d.year, d.month, d.day).isBefore(today);
+  }
 
   factory Opportunity.fromJson(Map<String, dynamic> json) {
     final date = json['deadline']?.toString();
@@ -39,6 +51,7 @@ class Opportunity {
       applicationUrl: json['application_url']?.toString() ?? '',
       sourceUrl: json['source_url']?.toString() ?? '',
       deadline: date == null || date.isEmpty ? null : DateTime.tryParse(date),
+      lastVerifiedAt: DateTime.tryParse(json['last_verified_at']?.toString() ?? ''),
     );
   }
 }

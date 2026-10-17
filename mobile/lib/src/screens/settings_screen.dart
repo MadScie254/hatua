@@ -1,59 +1,92 @@
 import 'package:flutter/material.dart';
+
 import '../data/local_store.dart';
+import '../l10n_helpers.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, required this.store});
   final LocalStore store;
 
   Future<void> _clear(BuildContext context) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
     final approved = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete local data?'),
-        content: const Text('This permanently removes goals, saved opportunities and cached public listings from this device.'),
+        title: Text(l10n.settingsDeleteConfirmTitle),
+        content: Text(l10n.settingsDeleteConfirmBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.delete)),
         ],
       ),
     );
     if (approved != true) return;
     try {
       await store.clearAll();
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Local app data cleared.')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.settingsDeleted)));
     } catch (_) {
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not clear all data. Please retry.')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.settingsDeleteFailed)));
     }
   }
 
   @override
-  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(16), children: [
-    Text('Settings & privacy', style: Theme.of(context).textTheme.headlineSmall),
-    const SizedBox(height: 14),
-    const Card(child: ListTile(
-      leading: Icon(Icons.person_outline),
-      title: Text('Guest mode'),
-      subtitle: Text('No account required. This version does not create or upload a personal profile.'),
-    )),
-    const Card(child: ListTile(
-      leading: Icon(Icons.shield_outlined),
-      title: Text('Privacy by design'),
-      subtitle: Text('Goals are stored using encrypted device storage. Public directory data may be cached. No medical history is collected.'),
-    )),
-    const Card(child: ListTile(
-      leading: Icon(Icons.language),
-      title: Text('Language'),
-      subtitle: Text('English interface in this starter build. Kiswahili translation is scheduled before public release.'),
-    )),
-    Card(child: ListTile(
-      leading: const Icon(Icons.delete_forever_outlined),
-      title: const Text('Delete my local data'),
-      subtitle: const Text('Remove saved listings, goals, and cached directories.'),
-      onTap: () => _clear(context),
-    )),
-    const SizedBox(height: 18),
-    const Text('HATUA v0.1.0 · Development preview'),
-    const SizedBox(height: 8),
-    const Text('HATUA is an information and referral tool, not a healthcare provider or a guarantee of employment.'),
-  ]);
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) => ListView(padding: const EdgeInsets.all(16), children: [
+        Semantics(header: true, child: Text(l10n.settingsTitle, style: theme.textTheme.headlineSmall)),
+        const SizedBox(height: 14),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: Text(l10n.settingsGuestTitle),
+            subtitle: Text(l10n.settingsGuestBody),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.shield_outlined),
+            title: Text(l10n.settingsPrivacyTitle),
+            subtitle: Text(l10n.settingsPrivacyBody),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ListTile(leading: const Icon(Icons.language), title: Text(l10n.settingsLanguageTitle)),
+              RadioGroup<String?>(
+                groupValue: store.languageCode,
+                onChanged: store.setLanguageCode,
+                child: Column(children: [
+                  RadioListTile<String?>(value: null, title: Text(l10n.settingsLanguageSystem)),
+                  RadioListTile<String?>(value: 'en', title: Text(l10n.settingsLanguageEnglish)),
+                  RadioListTile<String?>(value: 'sw', title: Text(l10n.settingsLanguageSwahili)),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: Text(l10n.settingsSwahiliDraftNote, style: theme.textTheme.bodySmall),
+              ),
+            ]),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.delete_forever_outlined),
+            title: Text(l10n.settingsDeleteTitle),
+            subtitle: Text(l10n.settingsDeleteBody),
+            onTap: () => _clear(context),
+          ),
+        ),
+        const SizedBox(height: 18),
+        Text(l10n.settingsVersion),
+        const SizedBox(height: 8),
+        Text(l10n.settingsDisclaimer),
+      ]),
+    );
+  }
 }

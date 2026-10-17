@@ -35,6 +35,19 @@ jobs:
       - name: Android runner must be tracked (no silent regeneration)
         run: test -f android/app/src/main/AndroidManifest.xml
       - run: flutter pub get --enforce-lockfile
+      - name: Generated localisations match the ARB files
+        run: |
+          flutter gen-l10n
+          git diff --exit-code -- lib/l10n
+      - name: English and Kiswahili define the same strings
+        run: |
+          python3 - <<'EOF'
+          import json, sys
+          en = {k for k in json.load(open('lib/l10n/app_en.arb')) if not k.startswith('@')}
+          sw = {k for k in json.load(open('lib/l10n/app_sw.arb')) if not k.startswith('@')}
+          if en != sw:
+              sys.exit(f'missing in sw: {sorted(en - sw)}; extra in sw: {sorted(sw - en)}')
+          EOF
       - run: flutter analyze
       - run: flutter test
 
