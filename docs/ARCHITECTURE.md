@@ -2,8 +2,10 @@
 
 ```mermaid
 flowchart TD
-  A[Android Flutter guest client] -->|GET public catalog over HTTPS| B[Django REST API]
-  B --> C[(PostgreSQL directory)]
+  A[Android Flutter guest client] -->|GET public catalog over HTTPS| W[Cloudflare Worker edge cache]
+  W -->|cache miss| B[Django REST API on Vercel fra1]
+  A -.->|until the Worker is deployed| B
+  B --> C[(Neon PostgreSQL, Frankfurt)]
   D[Internal Django Admin] -->|curate and verify| C
   A --> E[Public cache on device]
   A --> F[Encrypted local goals]

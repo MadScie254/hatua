@@ -1,6 +1,8 @@
 # HATUA | One step forward, every day
 
-**Status: v0.1.0 development foundation. NOT a finished, released, or clinically validated app.**
+**Status: v0.1.0 pilot foundation. NOT a finished, released, or clinically validated app.**
+
+**Live API (staging/pilot):** https://hatua-api.vercel.app/api/v1/health/ (Vercel + Neon Postgres; directory intentionally empty until staff verify entries). Deployment and operations: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 Kenya-first Android project connecting people to **verified economic opportunities** and **reliable addiction support resources**, plus private, on-device goals. Job discovery and recovery support remain separate and optional. The public app is free; future partner subscriptions can fund operations without charging for essential assistance.
 
@@ -12,7 +14,7 @@ Kenya-first Android project connecting people to **verified economic opportuniti
 - Only **verified, active and recently re-verified** records are published (90-day window by default); expired opportunities excluded.
 - Django Admin for staff (internal only): provenance required before verification, reviewer recorded, "Revoke now".
 - Offline fallback for **public** listings (24 h, then deleted); encrypted local goal storage.
-- Tests (21 backend, 39 Flutter, all passing locally), CI workflows, product/privacy/architecture docs.
+- Tests (35 backend, 40 Flutter, 11 edge Worker, all passing locally), CI workflows, product/privacy/architecture docs.
 - Claude handoff: [`CLAUDE.md`](CLAUDE.md), [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
 ### What's deliberately NOT built
@@ -22,7 +24,8 @@ Real provider catalogue, user accounts, applications, referrals, partner billing
 ## Repository layout
 
 ```text
-backend/       Django API + staff-managed directory + tests
+backend/       Django API + staff-managed directory + tests (deployed to Vercel)
+edge/          Cloudflare Worker: edge cache in front of the public API
 mobile/        Flutter app incl. tracked Android runner, l10n ARB files, tests, screenshot tool
 docs/          requirements, architecture, privacy, decisions, business, roadmap, handoff
 .github/       CI definitions

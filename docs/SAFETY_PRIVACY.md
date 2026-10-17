@@ -36,7 +36,9 @@ HATUA concerns financial vulnerability and substance-use support. Its credibilit
 | Personal goal titles / completion state | Encrypted device storage (Keystore-backed) | No |
 | Personal identifier, GPS location, recovery history | Not collected | No |
 
-Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure; describe this accurately when drafting a public privacy notice.
+Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure (Vercel, and Cloudflare once the edge cache is deployed); describe this accurately when drafting a public privacy notice.
+
+Server-side data (pilot deployment, 2026-10-18): public directory entries and staff admin accounts only, in Neon Postgres in Frankfurt (EU), served from Vercel functions in Frankfurt. Cloudflare caches only public `/api/v1/` responses for up to 5 minutes (1 hour if the origin is down) and never sees admin traffic. Review cross-border transfer obligations under Kenya's Data Protection Act before any personal data is stored server-side.
 
 Android backup: `allowBackup="false"`, `fullBackupContent="false"` and `data_extraction_rules.xml` exclude all app data from Google cloud backup and device-to-device transfer, so goals never leave the phone through backups (verified in the manifest, not yet on a device). The only Android permission requested is `INTERNET`; opening the dialer for 1192 or a provider needs no phone permission and places no call automatically.
 

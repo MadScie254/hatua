@@ -12,7 +12,7 @@
 - [x] API tests and Flutter widget tests written.
 - [x] Privacy and Claude handoff documents.
 - [x] Bootstrap real Flutter platform projects with Android SDK (Flutter 3.47.7, runner tracked).
-- [x] Install dependencies; run and pass backend/unit/Flutter tests and analyzer (locally: 21 backend, 39 Flutter; GitHub Actions blocked by account billing lock).
+- [x] Install dependencies; run and pass backend/unit/Flutter tests and analyzer (locally: 35 backend, 40 Flutter, 11 edge; GitHub Actions blocked by account billing lock).
 - [x] Verify manually authored initial Django migration against generated state (no changes detected).
 - [ ] Connect Android emulator/physical phone to local backend and run end-to-end smoke test.
 - [ ] Capture actual UI screenshots and accessibility observations. (Real-font test-harness screenshots: `mobile/tool/screenshots`; device screenshots and TalkBack still to do.)

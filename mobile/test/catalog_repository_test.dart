@@ -91,6 +91,12 @@ void main() {
     expect(result.source, CatalogSource.unavailable);
   });
 
+  test('base URL defaults: emulator in debug/test, https production for release', () {
+    expect(CatalogRepository.configuredBaseUrl, CatalogRepository.emulatorBaseUrl);
+    expect(CatalogRepository.productionBaseUrl, startsWith('https://'));
+    expect(CatalogRepository().baseUrl, CatalogRepository.emulatorBaseUrl);
+  });
+
   test('release mode refuses plain http and never sends the request', () async {
     final seen = <Uri>[];
     final repo = CatalogRepository(

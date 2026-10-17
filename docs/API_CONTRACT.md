@@ -1,5 +1,7 @@
 # API contract | v0.1 public, read-only
 
+Base URL (pilot): `https://hatua-api.vercel.app/api/v1/`, or the Cloudflare edge `https://hatua-api.<subdomain>.workers.dev/api/v1/` once deployed (same paths and payloads, plus an `x-hatua-cache: HIT|MISS|STALE|BYPASS` header and up to 5 minutes of caching). `GET /` returns a short description of the API.
+
 Base prefix `/api/v1/`. Anonymous requests allowed for public GETs; admin access remains protected by Django Admin login. Responses are JSON only. Anonymous requests are throttled (`60/min`).
 
 ## What "public" means
