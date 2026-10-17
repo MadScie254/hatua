@@ -195,3 +195,52 @@ class AdminWorkflowTests(TestCase):
             url = '/admin/directory/opportunity/' + (f'?state={state}' if state else '')
             self.assertEqual(self.client.get(url).status_code, 200, state)
         self.assertEqual(self.client.get('/admin/directory/supportresource/').status_code, 200)
+
+
+class EnsureSuperuserCommandTests(TestCase):
+    STRONG = 'correct-horse-battery-staple-91'
+
+    def call(self, **env):
+        from io import StringIO
+        from unittest import mock
+
+        from django.core.management import call_command
+
+        out = StringIO()
+        with mock.patch.dict('os.environ', env, clear=False):
+            call_command('ensure_superuser', stdout=out)
+        return out.getvalue()
+
+    def test_creates_once_and_never_prints_password(self):
+        output = self.call(DJANGO_SUPERUSER_USERNAME='daniel', DJANGO_SUPERUSER_PASSWORD=self.STRONG,
+                           DJANGO_SUPERUSER_EMAIL='staff@example.invalid')
+        user = get_user_model().objects.get(username='daniel')
+        self.assertTrue(user.is_superuser and user.is_staff)
+        self.assertTrue(user.check_password(self.STRONG))
+        self.assertNotIn(self.STRONG, output)
+
+    def test_existing_user_is_left_unchanged(self):
+        get_user_model().objects.create_superuser('daniel', '', 'already-changed-password-77')
+        output = self.call(DJANGO_SUPERUSER_USERNAME='daniel', DJANGO_SUPERUSER_PASSWORD=self.STRONG)
+        self.assertIn('left unchanged', output)
+        self.assertTrue(get_user_model().objects.get(username='daniel').check_password('already-changed-password-77'))
+
+    def test_skips_without_env(self):
+        output = self.call(DJANGO_SUPERUSER_USERNAME='', DJANGO_SUPERUSER_PASSWORD='')
+        self.assertIn('skipped', output)
+        self.assertFalse(get_user_model().objects.exists())
+
+    def test_weak_password_is_rejected(self):
+        from django.core.management.base import CommandError
+
+        with self.assertRaises(CommandError):
+            self.call(DJANGO_SUPERUSER_USERNAME='daniel', DJANGO_SUPERUSER_PASSWORD='password')
+        self.assertFalse(get_user_model().objects.exists())
+
+
+class IndexAndAdminPathTests(TestCase):
+    def test_index_lists_public_endpoints_only(self):
+        body = self.client.get('/').json()
+        self.assertEqual(body['service'], 'hatua-api')
+        self.assertIn('/api/v1/opportunities/', body['endpoints'])
+        self.assertNotIn('admin', str(body))

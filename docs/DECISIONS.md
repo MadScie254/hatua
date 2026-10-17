@@ -27,4 +27,10 @@
 | 2026-10-18 | Emergency card names no phone number | Unverified emergency numbers are worse than none; add only after professional verification for the pilot county |
 | 2026-10-18 | Release builds refuse non-https API URLs | Prevents shipping an APK that silently talks to the emulator default or plain http |
 
+| 2026-10-18 | Host the API on Vercel (Django preset, functions in fra1) with Neon Postgres (Frankfurt) via the Vercel Marketplace | Owner chose Vercel; Supabase org was at its 2-free-project limit. Neon scales to zero (first request ~1 s), never deletes data on the free plan, and its credentials go straight into Vercel. Trade-off: Vercel Hobby is non-commercial only |
+| 2026-10-18 | Migrations and first superuser run in the production build (`build.py`), never in previews | Serverless hosting gives no shell; previews must not change the production schema. Migrations use the unpooled connection |
+| 2026-10-18 | Admin moved off `/admin/` to `DJANGO_ADMIN_URL`, kept out of the public repo | Cuts drive-by login attempts; not a substitute for MFA (still TODO) |
+| 2026-10-18 | Cloudflare Worker caches only public GET `/api/v1/*` for 5 min, stale-on-error up to 1 h | Faster and more resilient for users in Kenya; admin never proxied. Revocation can take up to 5 min to reach the edge (1 h if the origin is down) |
+| 2026-10-18 | Worker deployment is a manual `wrangler deploy` by the owner | The assistant's Cloudflare connection cannot publish Workers and GitHub Actions is blocked by the billing lock |
+
 Next maintainer: append entries for non-trivial scope, permission, storage, identity and integration changes. Include rejected alternatives and trade-offs where important.

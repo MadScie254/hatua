@@ -1,0 +1,17 @@
+{
+  "name": "hatua-edge",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker: edge cache in front of the HATUA public API on Vercel.",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "4.147.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

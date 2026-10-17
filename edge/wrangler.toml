@@ -1,0 +1,20 @@
+# Cloudflare Worker that caches the PUBLIC HATUA API close to users in Kenya.
+# Deploy: npm install && npx wrangler login && npx wrangler deploy   (see docs/DEPLOYMENT.md)
+name = "hatua-api"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+# Vercel production URL of the Django API (no trailing slash).
+ORIGIN = "https://hatua-api.vercel.app"
+# Serve from cache without asking the origin for this long. Also the longest a revoked
+# listing can still be served by this edge after "Revoke now" in the admin.
+FRESH_SECONDS = "300"
+# If the origin is down or slow, keep serving the last good copy for up to this long.
+STALE_SECONDS = "3600"
+# Give up on the origin after this long (the app itself waits 12 s).
+ORIGIN_TIMEOUT_MS = "8000"
+
+[observability]
+enabled = true

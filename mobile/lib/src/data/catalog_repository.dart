@@ -47,12 +47,18 @@ class CatalogRepository {
         baseUrl = baseUrl ?? configuredBaseUrl,
         requireHttps = requireHttps ?? kReleaseMode;
 
-  /// Set with `--dart-define=HATUA_API_URL=https://api.example`. The default only works
-  /// from the Android emulator against a local dev server.
-  static const configuredBaseUrl = String.fromEnvironment(
-    'HATUA_API_URL',
-    defaultValue: 'http://10.0.2.2:8000',
-  );
+  static const _definedBaseUrl = String.fromEnvironment('HATUA_API_URL');
+
+  /// Live pilot API (docs/DEPLOYMENT.md). Release builds use it unless HATUA_API_URL is set,
+  /// e.g. to the Cloudflare edge URL.
+  static const productionBaseUrl = 'https://hatua-api.vercel.app';
+
+  /// Local Django dev server as seen from the Android emulator.
+  static const emulatorBaseUrl = 'http://10.0.2.2:8000';
+
+  /// `--dart-define=HATUA_API_URL=...` wins; otherwise production in release, emulator in debug.
+  static String get configuredBaseUrl =>
+      _definedBaseUrl.isNotEmpty ? _definedBaseUrl : (kReleaseMode ? productionBaseUrl : emulatorBaseUrl);
 
   /// Cached listings older than this are discarded so revoked or corrected entries
   /// do not linger on devices. See docs/CONTENT_VERIFICATION.md.
