@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HATUA: verified opportunities and confidential support information in Kenya. Free, no account needed.">
+  <meta name="theme-color" content="#087F66">
+  <!-- Pilot: keep out of search results until public launch (docs/DEPLOYMENT.md). -->
+  <meta name="robots" content="noindex">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="HATUA">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>HATUA</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #F5F7F5; color: #17201D;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    @media (prefers-color-scheme: dark) { html, body { background: #101513; color: #E3EAE6; } }
+    #hatua-loading { box-sizing: border-box; min-height: 100%; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 24px; text-align: center; gap: 12px; }
+    #hatua-loading h1 { margin: 0; font-size: 28px; color: #087F66; letter-spacing: 1px; }
+    #hatua-loading p { margin: 0; max-width: 28em; line-height: 1.45; }
+    #hatua-loading .help { margin-top: 20px; padding: 12px 16px; border-radius: 14px;
+      background: rgba(8, 127, 102, 0.10); }
+    #hatua-loading a { color: #087F66; font-weight: 600; }
+    .spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(8,127,102,.25);
+      border-top-color: #087F66; animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  </style>
+</head>
+<body>
+  <!-- Plain HTML shown while the app downloads; removed by flutter_bootstrap.js once it starts.
+       The helpline line is here on purpose so it is readable even on a slow connection. -->
+  <div id="hatua-loading" role="status" aria-live="polite">
+    <h1>HATUA</h1>
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading… / Inapakia…</p>
+    <p class="help">Need to talk to someone now? NACADA alcohol and drug support:
+      <a href="tel:1192">1192</a>. Not an emergency ambulance service.<br>
+      Unahitaji kuongea na mtu? NACADA: <a href="tel:1192">1192</a>. Si huduma ya dharura ya ambulensi.</p>
+  </div>
+  <noscript>
+    <p style="padding:24px">HATUA needs JavaScript. NACADA alcohol and drug support: 1192 (not an ambulance service).</p>
+  </noscript>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

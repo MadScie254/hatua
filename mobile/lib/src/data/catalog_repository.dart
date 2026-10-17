@@ -56,9 +56,14 @@ class CatalogRepository {
   /// Local Django dev server as seen from the Android emulator.
   static const emulatorBaseUrl = 'http://10.0.2.2:8000';
 
-  /// `--dart-define=HATUA_API_URL=...` wins; otherwise production in release, emulator in debug.
-  static String get configuredBaseUrl =>
-      _definedBaseUrl.isNotEmpty ? _definedBaseUrl : (kReleaseMode ? productionBaseUrl : emulatorBaseUrl);
+  /// `--dart-define=HATUA_API_URL=...` wins. On the web the app calls its own origin, which the
+  /// hosting layer (mobile/vercel.json rewrites) forwards to the API, so no CORS is needed.
+  /// Otherwise: production in release, emulator in debug.
+  static String get configuredBaseUrl {
+    if (_definedBaseUrl.isNotEmpty) return _definedBaseUrl;
+    if (kIsWeb) return Uri.base.origin;
+    return kReleaseMode ? productionBaseUrl : emulatorBaseUrl;
+  }
 
   /// Cached listings older than this are discarded so revoked or corrected entries
   /// do not linger on devices. See docs/CONTENT_VERIFICATION.md.

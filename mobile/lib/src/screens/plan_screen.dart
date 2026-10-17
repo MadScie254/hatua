@@ -81,9 +81,23 @@ class _PlanScreenState extends State<PlanScreen> {
     final header = <Widget>[
       Semantics(header: true, child: Text(l10n.planTitle, style: theme.textTheme.headlineSmall)),
       const SizedBox(height: 8),
-      Text(l10n.planIntro),
-      const SizedBox(height: 18),
+      // The intro promises encrypted on-device storage, which only holds where the vault exists.
+      if (store.goalsStatus != GoalsStatus.unsupported) ...[Text(l10n.planIntro), const SizedBox(height: 18)],
+      if (store.goalsStatus == GoalsStatus.unsupported) const SizedBox(height: 10),
     ];
+
+    if (store.goalsStatus == GoalsStatus.unsupported) {
+      return ListView(padding: const EdgeInsets.all(16), children: [
+        ...header,
+        Card(
+          child: ListTile(
+            leading: Icon(Icons.phone_android, color: theme.colorScheme.primary),
+            title: Text(l10n.planUnsupportedTitle),
+            subtitle: Text(l10n.planUnsupportedBody),
+          ),
+        ),
+      ]);
+    }
 
     if (store.goalsStatus == GoalsStatus.unavailable) {
       return ListView(padding: const EdgeInsets.all(16), children: [

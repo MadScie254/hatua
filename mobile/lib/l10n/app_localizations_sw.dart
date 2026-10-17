@@ -364,4 +364,16 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get technicalDetails => 'Maelezo ya kiufundi';
+
+  @override
+  String get planUnsupportedTitle =>
+      'Mpango Wangu unapatikana kwenye programu ya Android';
+
+  @override
+  String get planUnsupportedBody =>
+      'Malengo binafsi husimbwa kwa kutumia maunzi salama ya simu yako. Vivinjari haviwezi kutoa ulinzi huo, kwa hivyo toleo hili la wavuti halihifadhi malengo. Sehemu nyingine zote zinafanya kazi hapa.';
+
+  @override
+  String get settingsPrivacyBodyNoGoals =>
+      'Toleo hili la wavuti halihifadhi malengo. Orodha ulizohifadhi, kaunti yako na lugha yako huhifadhiwa kwenye kivinjari hiki pekee, na taarifa za orodha ya umma kwa hadi saa 24. Hakuna kinachopakiwa na hakuna historia ya matibabu inayokusanywa.';
 }

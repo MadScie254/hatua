@@ -102,6 +102,11 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
 /// can prove plaintext never reaches SharedPreferences. Set [failWith] to simulate a broken
 /// Keystore (as seen on a pilot phone).
 class FakeGoalVault implements GoalVault {
+  FakeGoalVault({this.isSupported = true});
+
+  @override
+  final bool isSupported;
+
   String? failWith;
   int deleteCalls = 0;
 
