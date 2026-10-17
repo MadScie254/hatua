@@ -132,7 +132,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             cachedMessage: l10n.statusCachedOpportunities,
             onRetry: _load,
           ),
-          if (_loading)
+          if (_loading && _items.isEmpty)
             const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
           else if (filtered.isEmpty && open.isNotEmpty)
             MessageCard(
@@ -141,7 +141,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             )
           else if (filtered.isEmpty && _source != CatalogSource.unavailable)
             MessageCard(message: l10n.exploreEmpty),
-          if (!_loading)
+          if (!_loading || _items.isNotEmpty)
             for (final op in filtered)
               _OpportunityCard(
                 opportunity: op,

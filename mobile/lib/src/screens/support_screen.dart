@@ -152,7 +152,7 @@ class _SupportScreenState extends State<SupportScreen> {
           cachedMessage: l10n.statusCachedSupport,
           onRetry: _load,
         ),
-        if (_loading)
+        if (_loading && _items.isEmpty)
           const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
         else if (filtered.isEmpty && _items.isNotEmpty)
           MessageCard(
@@ -161,7 +161,7 @@ class _SupportScreenState extends State<SupportScreen> {
           )
         else if (filtered.isEmpty)
           MessageCard(message: l10n.supportEmpty),
-        if (!_loading)
+        if (!_loading || _items.isNotEmpty)
           for (final r in filtered)
             Card(
               child: Padding(

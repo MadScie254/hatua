@@ -12,7 +12,7 @@ Kenya-first Android project connecting people to **verified economic opportuniti
 - Only **verified, active and recently re-verified** records are published (90-day window by default); expired opportunities excluded.
 - Django Admin for staff (internal only): provenance required before verification, reviewer recorded, "Revoke now".
 - Offline fallback for **public** listings (24 h, then deleted); encrypted local goal storage.
-- Tests (21 backend, 38 Flutter, all passing locally), CI workflows, product/privacy/architecture docs.
+- Tests (21 backend, 39 Flutter, all passing locally), CI workflows, product/privacy/architecture docs.
 - Claude handoff: [`CLAUDE.md`](CLAUDE.md), [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
 ### What's deliberately NOT built

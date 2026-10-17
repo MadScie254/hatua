@@ -1,7 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:hatua_app/src/app.dart';
+import 'package:hatua_app/src/data/catalog_repository.dart';
 import 'package:hatua_app/src/data/local_store.dart';
 import 'package:hatua_app/src/screens/explore_screen.dart';
 import 'package:hatua_app/src/screens/home_screen.dart';
@@ -95,6 +101,30 @@ void main() {
       await tapVisible(tester, find.text('Saved only'));
       expect(find.text('Nairobi job'), findsOneWidget);
       expect(find.text('Kisumu training'), findsNothing);
+    });
+
+    testWidgets('keeps cards visible while a pull-to-refresh is in flight', (tester) async {
+      useTallPhone(tester);
+      final gate = Completer<void>();
+      var calls = 0;
+      final client = MockClient((request) async {
+        if (++calls > 1) await gate.future;
+        return http.Response(jsonEncode(sampleOpportunities), 200);
+      });
+      final repo = CatalogRepository(client: client, clock: () => testNow, baseUrl: 'http://api.test', requireHttps: false);
+      await tester.pumpWidget(localized(ExploreScreen(store: store, repository: repo, clock: () => testNow)));
+      await tester.pumpAndSettle();
+      // The pull needed scales with viewport height (this test phone is 2400dp tall).
+      await tester.fling(find.text('Explore opportunities'), const Offset(0, 1200), 1000);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1)); // scroll animation
+      await tester.pump(const Duration(seconds: 1)); // indicator settles and calls onRefresh
+      await tester.pump(const Duration(milliseconds: 100)); // let the request start
+      expect(calls, 2, reason: 'refresh request should be pending');
+      expect(find.text('Nairobi job'), findsOneWidget);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Nairobi job'), findsOneWidget);
     });
 
     testWidgets('server down with no saved copy shows retry, not a misleading empty list', (tester) async {

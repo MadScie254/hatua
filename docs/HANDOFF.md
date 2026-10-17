@@ -32,8 +32,11 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | `cd mobile && flutter pub get` | OK (lockfile committed) |
 | `flutter gen-l10n` | OK, generated files committed |
 | `flutter analyze` | **No issues found** |
-| `flutter test` | **38/38 passed** |
+| `flutter test` | **39/39 passed** |
 | `flutter test tool/screenshots/screenshots_test.dart --dart-define=SHOTS_DIR=…` | 4/4, 11 PNGs rendered with real fonts and reviewed by eye |
+| Fresh clone of PR branch, new venv, `flutter pub get --enforce-lockfile`, gen-l10n diff, ARB key parity | all clean (matches what CI will run) |
+| Live smoke test: `runserver` with 3 opportunities + 1 resource, `curl` every endpoint | stale (200-day) record hidden; `?county=Kisumu` → nationwide only; `?category=casino` → 400; helpline served |
+| Live contract test: app's real `CatalogRepository` against that server (throwaway test, not committed) | parsed 2 opportunities + 1 resource; `+03:00` timestamps parsed; counties valid |
 | `flutter build apk --debug` | see "Not verified" below |
 
 ## Not verified

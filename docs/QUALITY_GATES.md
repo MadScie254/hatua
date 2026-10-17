@@ -9,7 +9,7 @@
 - [x] `python manage.py check --deploy` reviewed with production-like env (only W021 HSTS preload, deliberate). Re-run with the real production env.
 - [x] `ruff check .` passes. *(local)*
 - [ ] Android platform generated, package ID set and tracked in Git. *(generated and tracked; package ID still placeholder)*
-- [x] `flutter pub get`, `flutter analyze` and `flutter test` pass. *(local, 38 tests)*
+- [x] `flutter pub get`, `flutter analyze` and `flutter test` pass. *(local, 39 tests)*
 - [ ] End-to-end Android browse offline/online smoke tests pass.
 - [ ] Release APK builds with HTTPS-only production API.
 

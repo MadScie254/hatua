@@ -23,7 +23,7 @@ Returns an array of at most 100 public opportunities, newest first.
 | Param | Meaning |
 |---|---|
 | `county` | One of the 47 county names (e.g. `Nairobi`, `Homa Bay`, `Murang'a`). Matches that county **and** `Nationwide`. Case-insensitive. |
-| `category` | `job`, `training`, `grant`, `apprenticeship` or `other`. Any other value → **400** `{"category": ["Must be one of: …"]}`. |
+| `category` | `job`, `training`, `grant`, `apprenticeship` or `other`. Any other value → **400** `{"category": "Must be one of: job, training, grant, apprenticeship, other."}`. |
 | `q` | Case-insensitive substring of title, summary or organisation (first 100 chars used). |
 
 Structural example, **not a real opportunity**:

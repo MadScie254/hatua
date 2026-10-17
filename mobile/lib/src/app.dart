@@ -26,15 +26,22 @@ class _HatuaAppState extends State<HatuaApp> {
   late final CatalogRepository _repository = widget.repository ?? CatalogRepository();
   bool _ready = false;
   bool _failed = false;
+  Locale? _locale;
 
   @override
   void initState() {
     super.initState();
+    _store.addListener(_onStoreChanged);
     _load();
+  }
+
+  void _onStoreChanged() {
+    if (_store.locale != _locale && mounted) setState(() => _locale = _store.locale);
   }
 
   @override
   void dispose() {
+    _store.removeListener(_onStoreChanged);
     if (widget.store == null) _store.dispose();
     if (widget.repository == null) _repository.dispose();
     super.dispose();
@@ -69,23 +76,20 @@ class _HatuaAppState extends State<HatuaApp> {
   }
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: _store,
-        builder: (context, _) => MaterialApp(
-          onGenerateTitle: (context) => context.l10n.appTitle,
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: ThemeMode.system,
-          locale: _store.locale,
-          supportedLocales: AppLocalizations.supportedLocales,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: _failed
-              ? _StorageErrorScreen(onRetry: _load, onReset: _resetAndLoad)
-              : !_ready
-                  ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-                  : AppShell(store: _store, repository: _repository),
-        ),
+  Widget build(BuildContext context) => MaterialApp(
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.system,
+        locale: _locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: _failed
+            ? _StorageErrorScreen(onRetry: _load, onReset: _resetAndLoad)
+            : !_ready
+                ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+                : AppShell(store: _store, repository: _repository),
       );
 }
 
