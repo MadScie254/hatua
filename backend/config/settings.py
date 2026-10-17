@@ -2,10 +2,11 @@
 import os
 from pathlib import Path
 
-import dj_database_url
+from config.deploy import admin_path, database_config, on_vercel, platform_hosts, split_csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DJANGO_DEBUG', '0') == '1'
+ON_VERCEL = on_vercel(os.environ)
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '')
 if not SECRET_KEY:
     if DEBUG:
@@ -13,9 +14,17 @@ if not SECRET_KEY:
     else:
         raise RuntimeError('DJANGO_SECRET_KEY must be configured in production')
 
-ALLOWED_HOSTS = [x.strip() for x in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if x.strip()]
-if not DEBUG and not os.getenv('DJANGO_ALLOWED_HOSTS'):
+# Explicit hosts from the environment, plus the hostnames Vercel assigns to this deployment.
+_PLATFORM_HOSTS = platform_hosts(os.environ)
+ALLOWED_HOSTS = split_csv(os.getenv('DJANGO_ALLOWED_HOSTS', '' if not DEBUG else 'localhost,127.0.0.1'))
+ALLOWED_HOSTS += [h for h in _PLATFORM_HOSTS if h not in ALLOWED_HOSTS]
+if not DEBUG and not ALLOWED_HOSTS:
     raise RuntimeError('DJANGO_ALLOWED_HOSTS must be configured in production')
+CSRF_TRUSTED_ORIGINS = split_csv(os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS'))
+CSRF_TRUSTED_ORIGINS += [f'https://{h}' for h in _PLATFORM_HOSTS if f'https://{h}' not in CSRF_TRUSTED_ORIGINS]
+
+# Staff admin path. Override in production so the login page is not at the well-known /admin/.
+ADMIN_URL = admin_path(os.getenv('DJANGO_ADMIN_URL'))
 
 INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
@@ -43,13 +52,13 @@ TEMPLATES = [{
         'django.contrib.messages.context_processors.messages',
     ]},
 }]
+# WSGI only: Vercel prefers ASGI when both are set, and every view here is synchronous.
 WSGI_APPLICATION = 'config.wsgi.application'
-ASGI_APPLICATION = 'config.asgi.application'
 
 url = os.getenv('DATABASE_URL')
 if not url and not DEBUG:
     raise RuntimeError('DATABASE_URL must be configured in production')
-DATABASES = {'default': dj_database_url.config(default=url or f'sqlite:///{BASE_DIR / "db.sqlite3"}', conn_max_age=60)}
+DATABASES = {'default': database_config(url or f'sqlite:///{BASE_DIR / "db.sqlite3"}', serverless=ON_VERCEL)}
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -90,3 +99,19 @@ SECURE_SSL_REDIRECT = not DEBUG and os.getenv('DJANGO_SECURE_SSL_REDIRECT', '1')
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = False
+# Behind Vercel's (or another trusted) TLS-terminating proxy, trust X-Forwarded-Proto so
+# request.is_secure() is correct; otherwise SECURE_SSL_REDIRECT would loop.
+if ON_VERCEL or os.getenv('DJANGO_TRUST_X_FORWARDED_PROTO') == '1':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Without this, Django sends production errors only to (unconfigured) admin email, so they
+# would never appear in the hosting platform's logs. Never log request bodies or goals.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'loggers': {
+        'django': {'handlers': ['console'], 'level': 'WARNING'},
+        'directory': {'handlers': ['console'], 'level': 'INFO'},
+    },
+}

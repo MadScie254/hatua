@@ -17,6 +17,17 @@ def health(request):
     return Response({'status': 'ok', 'service': 'hatua-api', 'version': 'v1'})
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def index(request):
+    """Plain description of the public API. Deliberately does not reveal the admin path."""
+    return Response({
+        'service': 'hatua-api',
+        'description': 'Public, read-only directory of verified opportunities and support resources (Kenya).',
+        'endpoints': ['/api/v1/health/', '/api/v1/opportunities/', '/api/v1/support-resources/'],
+    })
+
+
 class PublicDirectoryList(ListAPIView):
     """Anonymous, read-only list of published records with county/text/type filters."""
 
