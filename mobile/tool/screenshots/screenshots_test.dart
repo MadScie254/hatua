@@ -13,7 +13,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hatua_app/src/app.dart';
 import 'package:hatua_app/src/data/local_store.dart';
@@ -53,8 +52,7 @@ void main() {
 
   Future<LocalStore> freshStore({String? language, List<String> goals = const []}) async {
     SharedPreferences.setMockInitialValues({if (language != null) LocalStore.localeKey: language});
-    FlutterSecureStorage.setMockInitialValues({});
-    final store = LocalStore();
+    final store = LocalStore(vault: FakeGoalVault());
     await store.load();
     for (final goal in goals) {
       await store.addGoal(goal);

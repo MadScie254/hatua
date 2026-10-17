@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hatua_app/l10n/app_localizations.dart';
 import 'package:hatua_app/src/data/catalog_repository.dart';
+import 'package:hatua_app/src/data/goal_vault.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -95,4 +96,28 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
   await tester.tap(finder);
   await tester.pumpAndSettle();
+}
+
+/// In-memory stand-in for the Android Keystore vault. "Encrypts" by base64 + reversal so tests
+/// can prove plaintext never reaches SharedPreferences. Set [failWith] to simulate a broken
+/// Keystore (as seen on a pilot phone).
+class FakeGoalVault implements GoalVault {
+  String? failWith;
+  int deleteCalls = 0;
+
+  @override
+  Future<String> encrypt(String plainText) async {
+    if (failWith != null) throw GoalVaultException(failWith!);
+    return 'fake1:${String.fromCharCodes(base64Encode(utf8.encode(plainText)).codeUnits.reversed)}';
+  }
+
+  @override
+  Future<String> decrypt(String blob) async {
+    if (failWith != null) throw GoalVaultException(failWith!);
+    if (!blob.startsWith('fake1:')) throw const GoalVaultException('bad blob');
+    return utf8.decode(base64Decode(String.fromCharCodes(blob.substring(6).codeUnits.reversed)));
+  }
+
+  @override
+  Future<void> deleteKey() async => deleteCalls++;
 }

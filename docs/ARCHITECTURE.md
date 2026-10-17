@@ -20,7 +20,7 @@ flowchart TD
 - Local debug DB SQLite; PostgreSQL production DB via `DATABASE_URL`.
 - Staff uses Django Admin for publishing; public API only returns verified and active records.
 - No authentication or personal server-side data in v0.1. Staff Django Admin authentication only.
-- Public cache in `shared_preferences` (24 h, then deleted). Personal goals encrypted using OS-protected storage via `flutter_secure_storage` 11. Android backup and device transfer disabled for all app data.
+- Public cache in `shared_preferences` (24 h, then deleted). Personal goals encrypted with an AES-256-GCM key in the Android Keystore (`GoalVault.kt`, no user-auth prompt); only ciphertext is stored, in app-private preferences. If the Keystore fails, only My Plan is disabled. Android backup and device transfer disabled for all app data.
 - No background GPS, SMS, WhatsApp, contacts or accessibility service permissions. The only permission is `INTERNET`.
 - Release builds refuse non-https API URLs; cleartext is allowed only in debug builds and only to emulator/localhost hosts.
 - UI strings via Flutter gen-l10n (`mobile/lib/l10n`), English template plus draft Kiswahili.

@@ -39,7 +39,7 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | `cd mobile && flutter pub get` | OK (lockfile committed) |
 | `flutter gen-l10n` | OK, generated files committed |
 | `flutter analyze` | **No issues found** |
-| `flutter test` | **40/40 passed** |
+| `flutter test` | **45/45 passed** |
 | `flutter test tool/screenshots/screenshots_test.dart --dart-define=SHOTS_DIR=…` | 4/4, 11 PNGs rendered with real fonts and reviewed by eye |
 | Fresh clone of PR branch, new venv, `flutter pub get --enforce-lockfile`, gen-l10n diff, ARB key parity | all clean (matches what CI will run) |
 | Live smoke test: `runserver` with 3 opportunities + 1 resource, `curl` every endpoint | stale (200-day) record hidden; `?county=Kisumu` → nationwide only; `?category=casino` → 400; helpline served |
@@ -67,7 +67,7 @@ Mobile
 - Android: release `INTERNET` permission (it was missing), backups off (`allowBackup=false` + `data_extraction_rules.xml`), cleartext allowed only in debug builds and only to emulator/localhost, label `HATUA`. Application ID is still the placeholder `com.example.hatua_app`.
 - Release builds refuse a non-https `HATUA_API_URL`. The cache distinguishes network, offline copy and unavailable states; stale or corrupt caches are deleted.
 - County picker, category/kind chips, readable labels, "Last checked by HATUA on …", 1192 and emergency card shown first (even offline), safe `tel:` handling, lazy tab loading, language switch, all strings in `lib/l10n/*.arb`.
-- `flutter_secure_storage` 9 → 11 (safe now because no installs exist).
+- Goal encryption: first `flutter_secure_storage` 11; replaced in v0.1.1 by our own Keystore vault after the plugin failed on the owner's phone (see DECISIONS).
 
 ## Known risks and TODOs (carry forward)
 

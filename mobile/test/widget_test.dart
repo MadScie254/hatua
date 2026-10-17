@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -19,11 +18,12 @@ import 'helpers.dart';
 
 void main() {
   late LocalStore store;
+  late FakeGoalVault vault;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    FlutterSecureStorage.setMockInitialValues({});
-    store = LocalStore();
+    vault = FakeGoalVault();
+    store = LocalStore(vault: vault);
     await store.load();
   });
 
@@ -177,6 +177,42 @@ void main() {
       await tester.tap(find.byType(Checkbox));
       await tester.pumpAndSettle();
       expect(find.text('1 of 1 completed'), findsOneWidget);
+    });
+  });
+
+  group('Broken Keystore (seen on a pilot phone)', () {
+    testWidgets('app still opens and the directory and 1192 work', (tester) async {
+      useTallPhone(tester);
+      await store.addGoal('Private');
+      vault.failWith = 'KeyStoreException: simulated';
+      final broken = LocalStore(vault: vault);
+      await tester.pumpWidget(HatuaApp(store: broken, repository: fakeRepository()));
+      await tester.pumpAndSettle();
+      expect(find.text('Karibu HATUA'), findsOneWidget);
+      expect(find.text('Secure local storage could not be opened. Please retry.'), findsNothing);
+      await tester.tap(find.text('Support'));
+      await tester.pumpAndSettle();
+      expect(find.text('Open dialer: 1192'), findsOneWidget);
+      await tester.tap(find.text('Explore'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nairobi job'), findsOneWidget);
+    });
+
+    testWidgets('My Plan explains, shows technical details, and can retry', (tester) async {
+      useTallPhone(tester);
+      await store.addGoal('Private');
+      vault.failWith = 'KeyStoreException: simulated';
+      final broken = LocalStore(vault: vault);
+      await broken.load();
+      await tester.pumpWidget(localized(PlanScreen(store: broken)));
+      await tester.pumpAndSettle();
+      expect(find.text('Private goals are unavailable on this phone'), findsOneWidget);
+      expect(find.byType(TextField), findsNothing, reason: 'no input while goals cannot be saved');
+      await tapVisible(tester, find.text('Technical details'));
+      expect(find.text('KeyStoreException: simulated'), findsOneWidget);
+      vault.failWith = null;
+      await tapVisible(tester, find.widgetWithText(FilledButton, 'Retry'));
+      expect(find.text('Private'), findsOneWidget);
     });
   });
 

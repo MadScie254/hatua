@@ -33,7 +33,7 @@ HATUA concerns financial vulnerability and substance-use support. Its credibilit
 | Bookmarked opportunity IDs (never support resources) | Device preferences | No |
 | Chosen county (manual, optional) | Device preferences | No. The app filters on the device and does not send the county |
 | Chosen app language | Device preferences | No |
-| Personal goal titles / completion state | Encrypted device storage (Keystore-backed) | No |
+| Personal goal titles / completion state | Ciphertext in app-private preferences; AES-256-GCM key held in the Android Keystore (`GoalVault.kt`) | No |
 | Personal identifier, GPS location, recovery history | Not collected | No |
 
 Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure (Vercel, and Cloudflare once the edge cache is deployed); describe this accurately when drafting a public privacy notice.
