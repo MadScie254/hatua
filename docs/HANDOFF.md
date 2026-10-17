@@ -37,11 +37,12 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | Fresh clone of PR branch, new venv, `flutter pub get --enforce-lockfile`, gen-l10n diff, ARB key parity | all clean (matches what CI will run) |
 | Live smoke test: `runserver` with 3 opportunities + 1 resource, `curl` every endpoint | stale (200-day) record hidden; `?county=Kisumu` → nationwide only; `?category=casino` → 400; helpline served |
 | Live contract test: app's real `CatalogRepository` against that server (throwaway test, not committed) | parsed 2 opportunities + 1 resource; `+03:00` timestamps parsed; counties valid |
-| `flutter build apk --debug` | see "Not verified" below |
+| `flutter build apk --debug --target-platform android-arm64` (HEAD `1096783`) | **Built** `app-debug.apk` (after retries past Maven Central 429s) |
+| `aapt2 dump` on that APK | package `com.example.hatua_app`, label `HATUA`, minSdk 24 (Android 7.0), targetSdk 36; permissions: `INTERNET` only (+ androidx's internal signature-level `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`); `allowBackup=false`, `fullBackupContent=false`, `dataExtractionRules` set; debug `networkSecurityConfig` present; https/tel queries present |
 
 ## Not verified
 
-- **APK build.** Two local attempts failed on the network, not on code. The first hit a transient dependency resolution error during the first Gradle download. The second got HTTP **429 Too Many Requests** from `repo.maven.apache.org` while probing for Flutter engine artifacts. The CI job `build-debug-apk` covers this once Actions is unblocked. The plugin modules themselves compiled.
+- **Release APK.** `flutter build apk --release` failed locally on HTTP 429 from Maven Central (fetching the arm64 release engine), not on code. CI now builds the release APK and asserts its merged manifest (INTERNET only, backup off, no cleartext/network-security override).
 - No emulator or physical-device run, no TalkBack pass, no end-to-end test against a running Django server.
 - Kiswahili strings are a **draft** written by an AI assistant. They need native-speaker review, and the SAFETY COPY keys (`supportNacadaBody`, `supportEmergencyBody`) need review by a qualified professional before any pilot.
 - No real listings exist. Both directories are empty by design.

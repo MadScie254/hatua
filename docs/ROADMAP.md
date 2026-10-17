@@ -17,7 +17,8 @@
 - [ ] Connect Android emulator/physical phone to local backend and run end-to-end smoke test.
 - [ ] Capture actual UI screenshots and accessibility observations. (Real-font test-harness screenshots: `mobile/tool/screenshots`; device screenshots and TalkBack still to do.)
 - [x] Commit generated Android runner after checking package ID and permissions.
-- [ ] Build an APK (CI job added; local build blocked by Maven Central rate limiting).
+- [x] Build a debug APK (arm64, local) and inspect its merged manifest.
+- [ ] Build a release APK (CI job added; local build blocked by Maven Central rate limiting).
 
 ## Phase 1: One-county trustworthy public pilot
 

@@ -39,7 +39,7 @@ Backend: create a Python venv, install `backend/requirements-dev.txt`, export `D
 
 ## Validation status (updated 2026-10-18)
 
-Locally verified: backend migrations/check/21 tests/ruff, Flutter analyze/39 tests, real-font screenshots. NOT yet verified: APK build (blocked by Maven Central rate limiting locally; CI job exists), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
+Locally verified: backend migrations/check/21 tests/ruff, Flutter analyze/39 tests, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
 
 ## Next PRs (suggested sequence)
 
