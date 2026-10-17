@@ -6,15 +6,15 @@ import '../data/local_store.dart';
 import '../models/opportunity.dart';
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key, required this.store});
+  const ExploreScreen({super.key, required this.store, required this.repository});
   final LocalStore store;
+  final CatalogRepository repository;
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  final _repo = const CatalogRepository();
   final _search = TextEditingController();
   List<Opportunity> _items = [];
   bool _loading = true;
@@ -35,7 +35,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final result = await _repo.opportunities();
+    final result = await widget.repository.opportunities();
     if (!mounted) return;
     setState(() { _items = result.items; _fromCache = result.fromCache; _loading = false; });
   }

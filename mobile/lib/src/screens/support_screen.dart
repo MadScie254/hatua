@@ -5,13 +5,13 @@ import '../data/catalog_repository.dart';
 import '../models/support_resource.dart';
 
 class SupportScreen extends StatefulWidget {
-  const SupportScreen({super.key});
+  const SupportScreen({super.key, required this.repository});
+  final CatalogRepository repository;
   @override
   State<SupportScreen> createState() => _SupportScreenState();
 }
 
 class _SupportScreenState extends State<SupportScreen> {
-  final _repo = const CatalogRepository();
   final _search = TextEditingController();
   List<SupportResource> _items = [];
   bool _loading = true;
@@ -31,7 +31,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final result = await _repo.resources();
+    final result = await widget.repository.resources();
     if (!mounted) return;
     setState(() { _items = result.items; _fromCache = result.fromCache; _loading = false; });
   }

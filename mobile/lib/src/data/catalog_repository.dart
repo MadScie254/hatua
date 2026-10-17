@@ -1,38 +1,89 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/opportunity.dart';
 import '../models/support_resource.dart';
 
-class CatalogResult<T> {
-  const CatalogResult({required this.items, required this.fromCache});
-  final List<T> items;
-  final bool fromCache;
+/// Where a [CatalogResult] came from.
+enum CatalogSource {
+  /// Fetched from the API just now.
+  network,
+
+  /// Server unreachable; showing a public copy saved less than [CatalogRepository.cacheLifetime] ago.
+  cache,
+
+  /// Server unreachable and no usable saved copy.
+  unavailable,
 }
 
-/// Public, verified API data only. Cache is not suitable for private health data.
-class CatalogRepository {
-  const CatalogRepository();
+class CatalogResult<T> {
+  const CatalogResult({required this.items, required this.source, this.fetchedAt});
 
-  static const baseUrl = String.fromEnvironment(
+  final List<T> items;
+  final CatalogSource source;
+
+  /// When [items] were downloaded from the server (null when [source] is unavailable).
+  final DateTime? fetchedAt;
+
+  bool get fromCache => source != CatalogSource.network;
+}
+
+/// Read-only access to the PUBLIC verified directory, with a short-lived offline copy.
+///
+/// The cache lives in SharedPreferences (not encrypted) and is therefore only suitable for
+/// public listings. Never route personal or health data through this class.
+class CatalogRepository {
+  CatalogRepository({
+    http.Client? client,
+    DateTime Function()? clock,
+    String? baseUrl,
+    bool? requireHttps,
+  })  : _client = client ?? http.Client(),
+        _clock = clock ?? DateTime.now,
+        baseUrl = baseUrl ?? configuredBaseUrl,
+        requireHttps = requireHttps ?? kReleaseMode;
+
+  /// Set with `--dart-define=HATUA_API_URL=https://api.example`. The default only works
+  /// from the Android emulator against a local dev server.
+  static const configuredBaseUrl = String.fromEnvironment(
     'HATUA_API_URL',
     defaultValue: 'http://10.0.2.2:8000',
   );
 
-  Future<CatalogResult<Opportunity>> opportunities() => _fetch(
-        '/api/v1/opportunities/',
-        'hatua.cache.opportunities.v1',
-        Opportunity.fromJson,
-      );
+  /// Cached listings older than this are discarded so revoked or corrected entries
+  /// do not linger on devices. See docs/CONTENT_VERIFICATION.md.
+  static const cacheLifetime = Duration(hours: 24);
+  static const requestTimeout = Duration(seconds: 12);
 
-  Future<CatalogResult<SupportResource>> resources() => _fetch(
-        '/api/v1/support-resources/',
-        'hatua.cache.resources.v1',
-        SupportResource.fromJson,
-      );
+  static const opportunitiesCacheKey = 'hatua.cache.opportunities.v1';
+  static const resourcesCacheKey = 'hatua.cache.resources.v1';
+
+  /// Every SharedPreferences key this class writes; used by "Delete my local data".
+  static const allCacheKeys = <String>[
+    opportunitiesCacheKey,
+    '$opportunitiesCacheKey.fetchedAt',
+    resourcesCacheKey,
+    '$resourcesCacheKey.fetchedAt',
+  ];
+
+  final http.Client _client;
+  final DateTime Function() _clock;
+  final String baseUrl;
+
+  /// True in release builds: refuse to talk to the API over plain http.
+  final bool requireHttps;
+
+  Future<CatalogResult<Opportunity>> opportunities() =>
+      _fetch('/api/v1/opportunities/', opportunitiesCacheKey, Opportunity.fromJson);
+
+  Future<CatalogResult<SupportResource>> resources() =>
+      _fetch('/api/v1/support-resources/', resourcesCacheKey, SupportResource.fromJson);
+
+  void dispose() => _client.close();
 
   Future<CatalogResult<T>> _fetch<T>(
     String path,
@@ -41,40 +92,56 @@ class CatalogRepository {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      final response = await http.get(Uri.parse('$baseUrl$path'))
-          .timeout(const Duration(seconds: 12));
-      if (response.statusCode != 200) {
-        throw StateError('HTTP ${response.statusCode}');
+      final uri = Uri.parse('$baseUrl$path');
+      if (requireHttps && uri.scheme != 'https') {
+        throw StateError('HATUA_API_URL must use https in release builds');
       }
+      final response = await _client.get(uri, headers: const {'Accept': 'application/json'})
+          .timeout(requestTimeout);
+      if (response.statusCode != 200) throw StateError('HTTP ${response.statusCode}');
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
       if (decoded is! List) throw const FormatException('Expected JSON array');
       final items = _parseList(decoded, parse);
+      final now = _clock();
       await prefs.setString(cacheKey, jsonEncode(decoded));
-      await prefs.setInt('$cacheKey.fetchedAt', DateTime.now().millisecondsSinceEpoch);
-      return CatalogResult(items: items, fromCache: false);
+      await prefs.setInt('$cacheKey.fetchedAt', now.millisecondsSinceEpoch);
+      return CatalogResult(items: items, source: CatalogSource.network, fetchedAt: now);
     } catch (_) {
-      // Offline-safe for PUBLIC content. Fail with empty list if cache is invalid.
-      final cached = prefs.getString(cacheKey);
-      final fetchedAt = prefs.getInt('$cacheKey.fetchedAt');
-      // Do not serve potentially revoked public listings indefinitely.
-      const cacheLifetime = Duration(hours: 24);
-      final cacheIsFresh = fetchedAt != null &&
-          DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(fetchedAt)) < cacheLifetime &&
-          DateTime.now().millisecondsSinceEpoch >= fetchedAt;
-      if (cached != null && cacheIsFresh) {
+      return _fromCache(prefs, cacheKey, parse);
+    }
+  }
+
+  Future<CatalogResult<T>> _fromCache<T>(
+    SharedPreferences prefs,
+    String cacheKey,
+    T Function(Map<String, dynamic>) parse,
+  ) async {
+    final cached = prefs.getString(cacheKey);
+    final fetchedAtMs = prefs.getInt('$cacheKey.fetchedAt');
+    if (cached != null && fetchedAtMs != null) {
+      final fetchedAt = DateTime.fromMillisecondsSinceEpoch(fetchedAtMs);
+      final age = _clock().difference(fetchedAt);
+      // A negative age means the clock moved backwards; do not trust the copy.
+      final fresh = !age.isNegative && age < cacheLifetime;
+      if (fresh) {
         try {
           final decoded = jsonDecode(cached);
           if (decoded is List) {
-            return CatalogResult(items: _parseList(decoded, parse), fromCache: true);
+            return CatalogResult(
+              items: _parseList(decoded, parse),
+              source: CatalogSource.cache,
+              fetchedAt: fetchedAt,
+            );
           }
         } catch (_) {
-          // The cache cannot be trusted or parsed, so discard it.
-          await prefs.remove(cacheKey);
-          await prefs.remove('$cacheKey.fetchedAt');
+          // Fall through: an unparseable copy is discarded below.
         }
       }
-      return CatalogResult(items: <T>[], fromCache: true);
     }
+    // Stale, corrupt or missing: remove it so it can never be shown later.
+    await prefs.remove(cacheKey);
+    await prefs.remove('$cacheKey.fetchedAt');
+    return CatalogResult(items: <T>[], source: CatalogSource.unavailable);
   }
 
   List<T> _parseList<T>(List<dynamic> raw, T Function(Map<String, dynamic>) parse) =>

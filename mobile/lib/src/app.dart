@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'data/catalog_repository.dart';
 import 'data/local_store.dart';
 import 'screens/explore_screen.dart';
 import 'screens/home_screen.dart';
@@ -56,13 +57,15 @@ class _BootstrapState extends State<_Bootstrap> {
 
   @override
   Widget build(BuildContext context) {
-    if (_error != null) return Scaffold(body: SafeArea(child: Center(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.lock_outline, size: 44),
-        Padding(padding: const EdgeInsets.all(20), child: Text(_error!, textAlign: TextAlign.center)),
-        FilledButton(onPressed: _load, child: const Text('Retry')),
-      ]),
-    )));
+    if (_error != null) {
+      return Scaffold(body: SafeArea(child: Center(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.lock_outline, size: 44),
+          Padding(padding: const EdgeInsets.all(20), child: Text(_error!, textAlign: TextAlign.center)),
+          FilledButton(onPressed: _load, child: const Text('Retry')),
+        ]),
+      )));
+    }
     if (!_ready) return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return _AppShell(store: _store);
   }
@@ -77,14 +80,21 @@ class _AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<_AppShell> {
+  final _repository = CatalogRepository();
   int _selected = 0;
+
+  @override
+  void dispose() {
+    _repository.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final pages = [
       HomeScreen(onNavigate: (i) => setState(() => _selected = i)),
-      ExploreScreen(store: widget.store),
-      const SupportScreen(),
+      ExploreScreen(store: widget.store, repository: _repository),
+      SupportScreen(repository: _repository),
       PlanScreen(store: widget.store),
       SettingsScreen(store: widget.store),
     ];
