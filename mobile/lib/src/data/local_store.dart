@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/goal.dart';
+import 'catalog_repository.dart';
 
 /// Bookmarks contain only public IDs. Goal titles use encrypted device storage.
 class LocalStore extends ChangeNotifier {
@@ -61,10 +62,9 @@ class LocalStore extends ChangeNotifier {
     await _secureStorage.delete(key: _goalsKey);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_savedKey);
-    await prefs.remove('hatua.cache.opportunities.v1');
-    await prefs.remove('hatua.cache.resources.v1');
-    await prefs.remove('hatua.cache.opportunities.v1.fetchedAt');
-    await prefs.remove('hatua.cache.resources.v1.fetchedAt');
+    for (final key in CatalogRepository.allCacheKeys) {
+      await prefs.remove(key);
+    }
     notifyListeners();
   }
 

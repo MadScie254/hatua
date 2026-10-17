@@ -1,27 +1,67 @@
 name: flutter-checks
 on:
   push:
+    branches: [main]
     paths: ['mobile/**', '.github/workflows/flutter.yml']
   pull_request:
     paths: ['mobile/**', '.github/workflows/flutter.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flutter-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Pinned so CI matches the version the code was last verified with (docs/HANDOFF.md).
+  FLUTTER_VERSION: '3.47.7'
+
 jobs:
   analyze-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-      - name: Bootstrap Android runner if missing
+      - name: Disable Flutter/Dart telemetry
+        run: flutter --disable-analytics
+      - name: Android runner must be tracked (no silent regeneration)
+        run: test -f android/app/src/main/AndroidManifest.xml
+      - run: flutter pub get --enforce-lockfile
+      - run: flutter analyze
+      - run: flutter test
+
+  build-debug-apk:
+    needs: analyze-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: mobile
-        run: flutter create --platforms android --project-name hatua_app .
-      - name: Dependencies
-        working-directory: mobile
-        run: flutter pub get
-      - name: Analyze
-        working-directory: mobile
-        run: flutter analyze
-      - name: Test
-        working-directory: mobile
-        run: flutter test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter --disable-analytics
+      - run: flutter pub get --enforce-lockfile
+      - name: Build debug APK (compiles manifests, resources and Gradle config)
+        run: flutter build apk --debug
+      - name: Release manifest must request INTERNET and disable backup
+        run: |
+          m=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.INTERNET' "$m"
+          grep -q 'android:allowBackup="false"' "$m"
+          ! grep -q 'usesCleartextTraffic="true"' "$m"
