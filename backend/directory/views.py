@@ -1,9 +1,9 @@
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
 
 from .models import Opportunity, SupportResource
 from .serializers import OpportunitySerializer, SupportResourceSerializer

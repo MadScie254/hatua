@@ -9,7 +9,7 @@ DEBUG = os.getenv('DJANGO_DEBUG', '0') == '1'
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '')
 if not SECRET_KEY:
     if DEBUG:
-        SECRET_KEY = 'dev-only-not-for-production-replace-before-deployment'
+        SECRET_KEY = 'dev-only-not-for-production-replace-before-deployment'  # noqa: S105 (DEBUG-only fallback)
     else:
         raise RuntimeError('DJANGO_SECRET_KEY must be configured in production')
 

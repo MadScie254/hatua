@@ -1,0 +1,28 @@
+# Explicit lint policy so results do not drift when ruff changes its defaults.
+# (ruff 0.17 widened the default rule set; the scaffold was written against older defaults.)
+target-version = "py311"
+line-length = 120
+extend-exclude = [".venv", "staticfiles"]
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # import sorting
+    "B",    # bugbear
+    "UP",   # pyupgrade
+    "DJ",   # flake8-django
+    "S",    # bandit-style security checks
+]
+ignore = [
+    "S101",  # assert is fine in tests
+]
+
+[lint.per-file-ignores]
+"*/migrations/*.py" = ["E501"]
+"*/tests.py" = ["S106"]
+"*/tests/*.py" = ["S106"]
+
+[lint.isort]
+known-first-party = ["config", "directory"]

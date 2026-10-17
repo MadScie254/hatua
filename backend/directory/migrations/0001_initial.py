@@ -1,5 +1,6 @@
 # Initial schema authored for HATUA bootstrap. Validate using makemigrations --check.
 import uuid
+
 from django.db import migrations, models
 
 

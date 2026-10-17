@@ -1,5 +1,6 @@
 """Public directory records only. NO user health or recovery profiles in MVP."""
 import uuid
+
 from django.db import models
 
 
