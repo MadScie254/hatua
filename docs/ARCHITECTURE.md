@@ -3,6 +3,8 @@
 ```mermaid
 flowchart TD
   A[Android Flutter guest client] -->|GET public catalog over HTTPS| W[Cloudflare Worker edge cache]
+  WB[Browser: same Flutter app, hatua-web on Vercel] -->|same-origin /api rewrite| B
+  WB --> WS[Browser localStorage: bookmarks, prefs, public cache. No goals]
   W -->|cache miss| B[Django REST API on Vercel fra1]
   A -.->|until the Worker is deployed| B
   B --> C[(Neon PostgreSQL, Frankfurt)]
@@ -23,6 +25,7 @@ flowchart TD
 - Public cache in `shared_preferences` (24 h, then deleted). Personal goals encrypted with an AES-256-GCM key in the Android Keystore (`GoalVault.kt`, no user-auth prompt); only ciphertext is stored, in app-private preferences. If the Keystore fails, only My Plan is disabled. Android backup and device transfer disabled for all app data.
 - No background GPS, SMS, WhatsApp, contacts or accessibility service permissions. The only permission is `INTERNET`.
 - Release builds refuse non-https API URLs; cleartext is allowed only in debug builds and only to emulator/localhost hosts.
+- Web build (`mobile/web/`, Vercel project `hatua-web`): same code; `CatalogRepository` calls the page's own origin and `mobile/vercel.json` proxies `/api/*` to the API. `GoalVault.isSupported` is false on the web, so My Plan is off there. CanvasKit and fonts self-hosted; strict CSP.
 - UI strings via Flutter gen-l10n (`mobile/lib/l10n`), English template plus draft Kiswahili.
 
 ## Application modules

@@ -22,3 +22,18 @@ flutter build apk --release --dart-define=HATUA_API_URL=https://api.example.inva
 
 The application ID is still the placeholder `com.example.hatua_app`. Google Play rejects `com.example.*`,
 which is intentional until the owner picks a permanent ID (see `docs/DECISIONS.md`).
+
+## Web build
+
+The same app also builds for browsers (`web/`, deployed as the Vercel project `hatua-web`, see
+`docs/DEPLOYMENT.md` section 6). On the web the app calls its own origin and `vercel.json` proxies `/api/*`
+to the API; My Plan is off because browsers have no hardware key store.
+
+```bash
+bash tool/web_build.sh   # what Vercel runs (expects Flutter on PATH or in .flutter-sdk/); output in build/web
+```
+
+The web app expects the API on its own origin (`/api/...`) and the API sends no CORS headers, so a plain
+`flutter run -d chrome` shows the directories as unavailable. To try a change, push a branch: Vercel builds a
+protected preview deployment of `hatua-web` with the `/api` rewrite. Locally, serve `build/web` over https
+behind a proxy that forwards `/api/` (release builds refuse plain http).
