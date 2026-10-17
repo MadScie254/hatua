@@ -19,7 +19,7 @@ env:
 
 jobs:
   analyze-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: mobile
@@ -40,7 +40,7 @@ jobs:
 
   build-debug-apk:
     needs: analyze-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: mobile
