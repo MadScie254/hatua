@@ -335,9 +335,33 @@ class AppLocalizationsSw extends AppLocalizations {
       'Imeshindikana kufuta data yote. Tafadhali jaribu tena.';
 
   @override
-  String get settingsVersion => 'HATUA v0.1.0 · Toleo la majaribio';
+  String get settingsVersion => 'HATUA v0.1.1 · Toleo la majaribio';
 
   @override
   String get settingsDisclaimer =>
       'HATUA ni chombo cha taarifa na rufaa, si mtoa huduma za afya wala hakikisho la ajira.';
+
+  @override
+  String get planUnavailableTitle =>
+      'Malengo binafsi hayapatikani kwenye simu hii';
+
+  @override
+  String get planUnavailableBody =>
+      'Hifadhi salama ya simu hii haikuweza kutumika, kwa hivyo HATUA haitahifadhi malengo badala ya kuyaweka bila ulinzi. Sehemu nyingine zote za programu bado zinafanya kazi.';
+
+  @override
+  String get planResetGoals => 'Weka upya malengo binafsi';
+
+  @override
+  String get planResetConfirmTitle => 'Weka upya malengo binafsi?';
+
+  @override
+  String get planResetConfirmBody =>
+      'Hii itafuta malengo yaliyohifadhiwa na ufunguo uliyoyalinda, kisha itaanza upya.';
+
+  @override
+  String get reset => 'Weka upya';
+
+  @override
+  String get technicalDetails => 'Maelezo ya kiufundi';
 }

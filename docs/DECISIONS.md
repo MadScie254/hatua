@@ -33,4 +33,7 @@
 | 2026-10-18 | Cloudflare Worker caches only public GET `/api/v1/*` for 5 min, stale-on-error up to 1 h | Faster and more resilient for users in Kenya; admin never proxied. Revocation can take up to 5 min to reach the edge (1 h if the origin is down) |
 | 2026-10-18 | Worker deployment is a manual `wrangler deploy` by the owner | The assistant's Cloudflare connection cannot publish Workers and GitHub Actions is blocked by the billing lock |
 
+| 2026-10-18 | Replace `flutter_secure_storage` with a ~60-line Keystore AES-GCM vault (`GoalVault.kt`) | v11's RSA-OAEP key-wrapping init failed on the owner's pilot phone on first launch (cause not identifiable remotely: candidates were the hidden `AndroidKeyStoreBCWorkaround` provider and a self-signed cert valid past 2049). The plugin's AES alternative forces biometric/PIN auth on secured phones. Our vault: one AES-256-GCM Keystore key, no auth, no RSA, no certificates |
+| 2026-10-18 | Secure-storage failure disables only My Plan, never the app | The directory and 1192 must stay reachable whatever happens to a phone's Keystore; My Plan shows the technical error so testers can report it |
+
 Next maintainer: append entries for non-trivial scope, permission, storage, identity and integration changes. Include rejected alternatives and trade-offs where important.

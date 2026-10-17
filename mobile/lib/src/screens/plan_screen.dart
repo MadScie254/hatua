@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../data/local_store.dart';
 import '../l10n_helpers.dart';
 
-/// Private goals. Stored only in encrypted on-device storage; never synced or uploaded.
-/// Deliberately no streaks, scores or reminders (docs/SAFETY_PRIVACY.md).
+/// Private goals. Stored only as Keystore-encrypted ciphertext on this device; never synced
+/// or uploaded. Deliberately no streaks, scores or reminders (docs/SAFETY_PRIVACY.md).
 class PlanScreen extends StatefulWidget {
   const PlanScreen({super.key, required this.store});
   final LocalStore store;
@@ -56,16 +56,81 @@ class _PlanScreenState extends State<PlanScreen> {
     }
   }
 
+  Future<void> _confirmReset() async {
+    final l10n = context.l10n;
+    final approved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.planResetConfirmTitle),
+        content: Text(l10n.planResetConfirmBody),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.reset)),
+        ],
+      ),
+    );
+    if (approved == true) await widget.store.resetGoals();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    final goals = widget.store.goals;
-    return ListView(padding: const EdgeInsets.all(16), children: [
+    final store = widget.store;
+    final goals = store.goals;
+    final header = <Widget>[
       Semantics(header: true, child: Text(l10n.planTitle, style: theme.textTheme.headlineSmall)),
       const SizedBox(height: 8),
       Text(l10n.planIntro),
       const SizedBox(height: 18),
+    ];
+
+    if (store.goalsStatus == GoalsStatus.unavailable) {
+      return ListView(padding: const EdgeInsets.all(16), children: [
+        ...header,
+        Card(
+          color: theme.colorScheme.errorContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.lock_outline, color: theme.colorScheme.onErrorContainer),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(l10n.planUnavailableTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onErrorContainer)),
+                ),
+              ]),
+              const SizedBox(height: 8),
+              Text(l10n.planUnavailableBody, style: TextStyle(color: theme.colorScheme.onErrorContainer)),
+              const SizedBox(height: 12),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                FilledButton.tonalIcon(
+                  onPressed: store.retryGoals,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.retry),
+                ),
+                TextButton(onPressed: _confirmReset, child: Text(l10n.planResetGoals)),
+              ]),
+              if (store.goalsError != null)
+                Theme(
+                  data: theme.copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(l10n.technicalDetails, style: theme.textTheme.bodySmall),
+                    children: [
+                      SelectableText(store.goalsError!, style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+            ]),
+          ),
+        ),
+      ]);
+    }
+
+    return ListView(padding: const EdgeInsets.all(16), children: [
+      ...header,
       TextField(
         controller: _input,
         maxLength: LocalStore.maxGoalLength,
@@ -88,13 +153,13 @@ class _PlanScreenState extends State<PlanScreen> {
           child: CheckboxListTile(
             controlAffinity: ListTileControlAffinity.leading,
             value: goal.isDone,
-            onChanged: (_) => _guard(() => widget.store.toggleGoal(goal.id), l10n.planUpdateFailed),
+            onChanged: (_) => _guard(() => store.toggleGoal(goal.id), l10n.planUpdateFailed),
             title: Text(goal.title,
                 style: TextStyle(decoration: goal.isDone ? TextDecoration.lineThrough : null)),
             secondary: IconButton(
               tooltip: l10n.planDelete,
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => _guard(() => widget.store.removeGoal(goal.id), l10n.planDeleteFailed),
+              onPressed: () => _guard(() => store.removeGoal(goal.id), l10n.planDeleteFailed),
             ),
           ),
         ),

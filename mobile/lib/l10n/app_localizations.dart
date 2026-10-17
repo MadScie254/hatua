@@ -677,7 +677,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsVersion.
   ///
   /// In en, this message translates to:
-  /// **'HATUA v0.1.0 · Development preview'**
+  /// **'HATUA v0.1.1 · Development preview'**
   String get settingsVersion;
 
   /// No description provided for @settingsDisclaimer.
@@ -685,6 +685,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'HATUA is an information and referral tool, not a healthcare provider or a guarantee of employment.'**
   String get settingsDisclaimer;
+
+  /// No description provided for @planUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private goals are unavailable on this phone'**
+  String get planUnavailableTitle;
+
+  /// No description provided for @planUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone\'s secure storage could not be used, so HATUA will not save goals rather than keep them unprotected. Everything else in the app still works.'**
+  String get planUnavailableBody;
+
+  /// No description provided for @planResetGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset private goals'**
+  String get planResetGoals;
+
+  /// No description provided for @planResetConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset private goals?'**
+  String get planResetConfirmTitle;
+
+  /// No description provided for @planResetConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes any saved goals and the key that protected them, then starts fresh.'**
+  String get planResetConfirmBody;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// Expandable section showing the raw error so testers can report it. Never contains user data.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical details'**
+  String get technicalDetails;
 }
 
 class _AppLocalizationsDelegate

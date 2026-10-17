@@ -22,7 +22,7 @@ You are continuing **HATUA**, a Kenya-first Android product for verified economi
 - `backend/directory/views.py`: GET-only public endpoints sharing one `PublicDirectoryList` base.
 - `backend/directory/admin.py`: staff curation with state filter, reviewer recording and "Revoke now"; not a partner dashboard.
 - Mobile `CatalogRepository`: read-only API, 24h public offline copy, https-only in release, reports network/cache/unavailable.
-- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + encrypted goals (`flutter_secure_storage` 11). Support resources are never bookmarked.
+- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
 - Mobile strings: `mobile/lib/l10n/app_en.arb` (template) and `app_sw.arb` (**draft** Kiswahili). Never hard-code UI text; run `flutter gen-l10n` and commit the generated files.
 
 ## Deployment
@@ -43,7 +43,7 @@ Backend: create a Python venv, install `backend/requirements-dev.txt`, export `D
 
 ## Validation status (updated 2026-10-18)
 
-Locally verified: backend migrations/check/35 tests/ruff, Flutter analyze/40 tests, edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
+Locally verified: backend migrations/check/35 tests/ruff, Flutter analyze/45 tests, edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
 
 ## Next PRs (suggested sequence)
 

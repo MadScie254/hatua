@@ -333,9 +333,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteFailed => 'Could not clear all data. Please retry.';
 
   @override
-  String get settingsVersion => 'HATUA v0.1.0 · Development preview';
+  String get settingsVersion => 'HATUA v0.1.1 · Development preview';
 
   @override
   String get settingsDisclaimer =>
       'HATUA is an information and referral tool, not a healthcare provider or a guarantee of employment.';
+
+  @override
+  String get planUnavailableTitle =>
+      'Private goals are unavailable on this phone';
+
+  @override
+  String get planUnavailableBody =>
+      'This phone\'s secure storage could not be used, so HATUA will not save goals rather than keep them unprotected. Everything else in the app still works.';
+
+  @override
+  String get planResetGoals => 'Reset private goals';
+
+  @override
+  String get planResetConfirmTitle => 'Reset private goals?';
+
+  @override
+  String get planResetConfirmBody =>
+      'This deletes any saved goals and the key that protected them, then starts fresh.';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get technicalDetails => 'Technical details';
 }

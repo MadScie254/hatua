@@ -1,7 +1,6 @@
 {
   "@@locale": "sw",
   "@@x-review-status": "DRAFT. Not yet reviewed by a native Kiswahili speaker or, for SAFETY COPY keys, by a qualified professional. Required before public release (docs/QUALITY_GATES.md).",
-
   "appTitle": "HATUA",
   "navHome": "Mwanzo",
   "navExplore": "Fursa",
@@ -13,7 +12,6 @@
   "delete": "Futa",
   "storageErrorMessage": "Hifadhi salama ya kifaa haikuweza kufunguliwa. Tafadhali jaribu tena.",
   "storageResetAction": "Futa data ya kifaa kisha uendelee",
-
   "homeGreeting": "Karibu HATUA",
   "homeTagline": "Hatua moja mbele, kila siku.",
   "homeQuestion": "Ni nini kingekusaidia leo?",
@@ -25,19 +23,16 @@
   "homeNextSteps": "Hatua zangu zijazo",
   "homeNextStepsSubtitle": "Fuatilia malengo yako kwa faragha kwenye kifaa chako",
   "homeGuestNote": "Vinjari bila vikwazo. Hakuna akaunti wala historia ya kibinafsi inayohitajika.",
-
   "filterCounty": "Kaunti",
   "filterAllCounties": "Kaunti zote",
   "countyNationwide": "Kitaifa",
   "filterAll": "Zote",
   "clearFilters": "Ondoa vichujio",
-
   "statusCachedTitle": "Nje ya mtandao au seva haipatikani",
   "statusCachedOpportunities": "Inaonyesha matangazo ya umma yaliyohifadhiwa {when}. Hakiki tarehe za mwisho tena ukiwa mtandaoni.",
   "statusCachedSupport": "Inaonyesha mawasiliano yaliyohifadhiwa {when}. Nambari na saa za kazi huenda zimebadilika.",
   "statusUnavailableTitle": "Imeshindikana kupakia orodha",
   "statusUnavailableBody": "Angalia muunganisho wako kisha ujaribu tena. Nakala zilizohifadhiwa hufutwa baada ya saa 24.",
-
   "exploreTitle": "Gundua fursa",
   "exploreIntro": "Matangazo ya umma hukaguliwa kabla ya kuchapishwa. Daima thibitisha maelezo kwenye chanzo asili.",
   "exploreSearchHint": "Tafuta ajira, mafunzo, mashirika",
@@ -53,13 +48,11 @@
   "applyAtSource": "Omba kupitia chanzo rasmi",
   "verifySource": "Thibitisha chanzo",
   "linkOpenFailed": "Imeshindikana kufungua kiungo hiki.",
-
   "categoryJob": "Ajira",
   "categoryTraining": "Mafunzo",
   "categoryGrant": "Ruzuku / msaada wa kifedha",
   "categoryApprenticeship": "Uanagenzi",
   "categoryOther": "Nyingine",
-
   "supportTitle": "Tafuta msaada",
   "supportIntro": "Kutafuta msaada ni uamuzi wako binafsi. Vinjari bila kuingia kwenye akaunti wala kueleza historia yako.",
   "supportTalkTitle": "Ongea na mtu",
@@ -73,12 +66,10 @@
   "supportCall": "Piga simu",
   "supportWebsite": "Tovuti",
   "contactOpenFailed": "Imeshindikana kufungua mawasiliano haya.",
-
   "kindHelpline": "Simu ya msaada",
   "kindFacility": "Kituo cha matibabu",
   "kindNgo": "Shirika la msaada",
   "kindEducation": "Nyenzo ya elimu",
-
   "planTitle": "Hatua zangu zijazo",
   "planIntro": "Weka malengo madogo yanayowezekana. Yanabaki kwenye kifaa hiki katika hifadhi iliyosimbwa na hayapakiwi popote.",
   "planInputLabel": "Hatua moja ninayotaka kuchukua",
@@ -90,7 +81,6 @@
   "planSaveFailed": "Imeshindikana kuhifadhi kwa usalama. Tafadhali jaribu tena.",
   "planUpdateFailed": "Imeshindikana kusasisha lengo.",
   "planDeleteFailed": "Imeshindikana kufuta lengo.",
-
   "settingsTitle": "Mipangilio na faragha",
   "settingsGuestTitle": "Hali ya mgeni",
   "settingsGuestBody": "Huhitaji akaunti. Toleo hili halitengenezi wala kupakia wasifu wako binafsi.",
@@ -107,6 +97,13 @@
   "settingsDeleteConfirmBody": "Hii itaondoa kabisa malengo, fursa zilizohifadhiwa, mapendeleo na matangazo ya umma yaliyohifadhiwa kwenye kifaa hiki.",
   "settingsDeleted": "Data ya programu kwenye kifaa imefutwa.",
   "settingsDeleteFailed": "Imeshindikana kufuta data yote. Tafadhali jaribu tena.",
-  "settingsVersion": "HATUA v0.1.0 · Toleo la majaribio",
-  "settingsDisclaimer": "HATUA ni chombo cha taarifa na rufaa, si mtoa huduma za afya wala hakikisho la ajira."
+  "settingsVersion": "HATUA v0.1.1 · Toleo la majaribio",
+  "settingsDisclaimer": "HATUA ni chombo cha taarifa na rufaa, si mtoa huduma za afya wala hakikisho la ajira.",
+  "planUnavailableTitle": "Malengo binafsi hayapatikani kwenye simu hii",
+  "planUnavailableBody": "Hifadhi salama ya simu hii haikuweza kutumika, kwa hivyo HATUA haitahifadhi malengo badala ya kuyaweka bila ulinzi. Sehemu nyingine zote za programu bado zinafanya kazi.",
+  "planResetGoals": "Weka upya malengo binafsi",
+  "planResetConfirmTitle": "Weka upya malengo binafsi?",
+  "planResetConfirmBody": "Hii itafuta malengo yaliyohifadhiwa na ufunguo uliyoyalinda, kisha itaanza upya.",
+  "reset": "Weka upya",
+  "technicalDetails": "Maelezo ya kiufundi"
 }

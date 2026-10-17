@@ -50,9 +50,19 @@ Rollback: Vercel → Deployments → pick the previous production deployment →
 
 Then add real, verified entries following `docs/CONTENT_VERIFICATION.md`. Each one needs a source URL and a check date before it can be marked verified.
 
-## 4. Deploy the Cloudflare edge cache (one time, from your computer)
+## 4. Deploy the Cloudflare edge cache (one time)
 
-The Cloudflare connection available to the assistant cannot publish Workers, so this step is yours:
+The Cloudflare connection available to the assistant cannot publish Workers, so this step is yours.
+
+**Option A: from a phone browser (no laptop needed).** Cloudflare's Git integration builds and deploys from GitHub on every push to `main`:
+
+1. Open https://dash.cloudflare.com → **Workers & Pages** → **Create application** → **Import a repository** (GitHub).
+2. Authorise the Cloudflare GitHub app for `MadScie254/hatua` if asked, then pick that repository.
+3. **Project name: `hatua-api`** (must equal `name` in `edge/wrangler.toml`, or the build fails).
+4. **Advanced settings → Root directory / Path: `edge`**. Leave the build command empty; the deploy command stays `npx wrangler deploy` (it uses the wrangler version pinned in `edge/package.json`).
+5. **Deploy**. When it finishes, the Worker's page shows its `https://hatua-api.<subdomain>.workers.dev` URL.
+
+**Option B: from a computer:**
 
 ```bash
 git pull
