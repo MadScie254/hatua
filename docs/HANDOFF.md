@@ -10,13 +10,16 @@
 |---|---|---|
 | **PR #1** | Android runner tracked and hardened, testable catalog repository, CI rework | merged (`3e6fdce`) |
 | **PR #2** | time-limited verification and admin workflow, mobile filters/offline states/en+sw strings | merged (`a09c562`) |
-| `claude/deploy-vercel-cloudflare` → **PR #3** | Vercel-ready backend, `build.py`, `ensure_superuser`, Cloudflare Worker in `edge/`, `docs/DEPLOYMENT.md` | see PR |
+| **PR #3** | Vercel-ready backend, `build.py`, `ensure_superuser`, Cloudflare Worker in `edge/`, `docs/DEPLOYMENT.md` | merged (`8f97523`) |
+| **PR #4** | own Keystore goal vault replacing `flutter_secure_storage`; storage failure only disables My Plan (v0.1.1) | merged (`1fcc1ca`) |
+| `claude/web-app` → **PR #5** | Flutter web build on Vercel `hatua-web`: branding, loading page with 1192, self-hosted assets, CSP, `/api` rewrite, no goals on web, CI job | see PR |
 
 ## Live deployment (2026-10-18)
 
 - **API:** https://hatua-api.vercel.app/api/v1/ (Vercel project `hatua-api`, team "madscie254's projects", functions in `fra1`). Every push to `main` deploys production.
 - **Database:** Neon Postgres `hatua-db` (Frankfurt), added by the owner via Vercel Storage; `DATABASE_URL`/`DATABASE_URL_UNPOOLED` injected by the integration.
 - **Admin:** at the path in Vercel env `DJANGO_ADMIN_URL` (kept out of this public repo). First superuser `daniel` was created by the first production build. The owner must change the initial password and delete `DJANGO_SUPERUSER_PASSWORD` from Vercel (`docs/DEPLOYMENT.md` step 3).
+- **Web app:** https://hatua-web.vercel.app (Vercel project `hatua-web`, root `mobile/`, static). First deployment `dpl_7GrJETYHS8RAU2rfrgxNj6tYK2J3` (commit `e8549a1`, branch build, therefore production): Flutter 3.47.7 installed by `tool/web_install.sh`, web compile 50 s, `check_web_build: OK`, whole build about 2 minutes. Verified from outside: `/` 200 with the CSP, `noindex`, `no-referrer`, `DENY` headers; `/api/v1/health/` 200 and `?category=casino` 400 through the rewrite (Django accepts the proxied host); `/admin/` 404 (only `/api/*` is proxied); `/font-fallback/…` 404. Headless Chromium (412×915, touch) against production: app starts, all five tabs render, only `hatua-web.vercel.app` contacted (10 requests), no page errors, no CSP violations, 1192 present in the accessibility tree, `localStorage` holds only the public directory cache, first load 3.13 MB on the wire.
 - **Cloudflare edge cache:** code in `edge/`, 11 tests, bundles with wrangler 4.147.0. **Not yet deployed**: needs `npx wrangler login && npx wrangler deploy` by the owner (step 4).
 - First deployment `dpl_37oghX2URDUHAef6k26zCvBsvgNe` (commit `9f0dd2e`, built from the PR branch because a project's first deployment is always production): `check --deploy` passed (W021 only), all migrations applied, superuser created, `collectstatic` ran.
 - Verified against production from outside: health 200; opportunities and support-resources 200 `[]` (~1 s incl. Neon wake-up); `?category=casino` 400; `/admin/` 404; staff login page 200 with CDN CSS; real staff login over HTTPS (CSRF) 302 → admin home 200; http→https 308.
@@ -47,6 +50,9 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | `flutter build apk --release --target-platform android-arm64,android-arm --dart-define=HATUA_API_URL=https://hatua-api.vercel.app` | **Built** `app-release.apk` (34.9 MB, debug-signed); aapt2: INTERNET-only, backup off, no cleartext override, minSdk 24; API URL present in both ABIs' `libapp.so` |
 | App's `CatalogRepository` (requireHttps) against production (throwaway test) | both directories `network`, 0 items (empty by design) |
 | `flutter build apk --debug --target-platform android-arm64` (HEAD `1096783`) | **Built** `app-debug.apk` (after retries past Maven Central 429s) |
+| `cd mobile && flutter test` (after web changes) | **48/48 passed** (adds web Plan/Settings copy tests) |
+| `bash tool/web_build.sh` (local SDK) | built `build/web` (41 MB on disk incl. unused CanvasKit variants), `check_web_build: OK` |
+| `build/web` behind a local HTTPS server that applies `vercel.json` headers and the `/api` rewrite (fixtures, then the live API), driven by Playwright Chromium | all tabs render; only same-origin requests; no CSP violations or page errors; My Plan shows the Android-only card; Settings shows the browser-storage privacy text; 2.67 MB brotli estimate |
 | `aapt2 dump` on that APK | package `com.example.hatua_app`, label `HATUA`, minSdk 24 (Android 7.0), targetSdk 36; permissions: `INTERNET` only (+ androidx's internal signature-level `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`); `allowBackup=false`, `fullBackupContent=false`, `dataExtractionRules` set; debug `networkSecurityConfig` present; https/tel queries present |
 
 ## Not verified
@@ -80,6 +86,8 @@ Mobile
 7. No privacy policy, contact or deletion process yet; no DPIA. Do not run a public beta.
 8. CI not yet green on GitHub (billing lock). Once it runs, fix anything it finds and record the run URL here.
 9. `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19; workflows are pinned to `ubuntu-24.04`.
+10. **Web app and the API throttle:** browser requests reach Django through Vercel's `/api` rewrite. Vercel does not forward external client IPs by default, so DRF's 60/min anonymous throttle may count all web users as one client (per function instance). Harmless at pilot scale (a 429 falls back to the cached copy, 1192 stays visible); before wider use, either call the API directly with CORS for `hatua-web` or make the throttle key on a header Vercel sets. Not measured yet.
+11. **Web app weight:** about 3 MB on first visit and no offline start (the Flutter service worker is deprecated). The Android app remains the data-light route; say so wherever the web link is shared. The empty-state text says "Pull down to refresh", which a desktop mouse user cannot do; they have to reload the page.
 
 ## Continuation command sequence
 
@@ -103,10 +111,11 @@ flutter test tool/screenshots/screenshots_test.dart --dart-define=SHOTS_DIR=$PWD
 
 0. Owner, now: change the admin password, delete `DJANGO_SUPERUSER_PASSWORD` in Vercel, deploy the Cloudflare Worker (`docs/DEPLOYMENT.md` steps 3–4).
 1. Owner: clear the GitHub billing lock so CI (backend, flutter, edge) runs on GitHub.
-2. Run the app on a real Android phone against a local backend (`adb reverse tcp:8000 tcp:8000`, `HATUA_API_URL=http://127.0.0.1:8000`). Do a TalkBack pass and record the observations here.
-3. Native-speaker review of `mobile/lib/l10n/app_sw.arb`. Remove the draft note in Settings only after review.
-4. Pick the pilot county; source and verify the first real entries through Admin, following `docs/CONTENT_VERIFICATION.md`.
-5. Write the threat model (`docs/THREAT_MODEL.md`) and a privacy-notice draft. Both are prerequisites for any beta.
+2. Owner: open https://hatua-web.vercel.app on a phone browser and report anything odd (it is the quickest way to see the app without installing the APK).
+3. Run the app on a real Android phone against a local backend (`adb reverse tcp:8000 tcp:8000`, `HATUA_API_URL=http://127.0.0.1:8000`). Do a TalkBack pass and record the observations here.
+4. Native-speaker review of `mobile/lib/l10n/app_sw.arb`. Remove the draft note in Settings only after review.
+5. Pick the pilot county; source and verify the first real entries through Admin, following `docs/CONTENT_VERIFICATION.md`.
+6. Write the threat model (`docs/THREAT_MODEL.md`) and a privacy-notice draft. Both are prerequisites for any beta.
 
 ## Important project boundaries (unchanged)
 

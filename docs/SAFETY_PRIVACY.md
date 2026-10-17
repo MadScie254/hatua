@@ -30,13 +30,15 @@ HATUA concerns financial vulnerability and substance-use support. Its credibilit
 | Data | Location | Shared with HATUA backend? |
 |---|---|---|
 | Public opportunity and provider directory | API, local cache (max 24 h, then deleted) | Public content only |
-| Bookmarked opportunity IDs (never support resources) | Device preferences | No |
-| Chosen county (manual, optional) | Device preferences | No. The app filters on the device and does not send the county |
-| Chosen app language | Device preferences | No |
-| Personal goal titles / completion state | Ciphertext in app-private preferences; AES-256-GCM key held in the Android Keystore (`GoalVault.kt`) | No |
+| Bookmarked opportunity IDs (never support resources) | Device preferences (web: browser `localStorage`) | No |
+| Chosen county (manual, optional) | Device preferences (web: browser `localStorage`) | No. The app filters on the device and does not send the county |
+| Chosen app language | Device preferences (web: browser `localStorage`) | No |
+| Personal goal titles / completion state | Android: ciphertext in app-private preferences; AES-256-GCM key held in the Android Keystore (`GoalVault.kt`). Web: not stored at all | No |
 | Personal identifier, GPS location, recovery history | Not collected | No |
 
-Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure (Vercel, and Cloudflare once the edge cache is deployed); describe this accurately when drafting a public privacy notice.
+**Web app (`hatua-web`, same Flutter code in a browser).** Goals are never stored: browsers have no hardware-backed key store, and storing goals with a key the same browser profile can read would only look encrypted, so My Plan is switched off and says so. Bookmarked opportunity IDs, county, language and the 24-hour public directory copy are kept in the site's `localStorage` (cleared by "Delete my local data" or by clearing site data); anyone using the same browser profile can read them, which is acceptable only because none of them reveals support-seeking. The page loads nothing from third parties (CanvasKit, fonts and icons are served by HATUA's own Vercel project; the Flutter engine's Google-hosted fallback font URL is overridden), the CSP allows only same-origin connections, and API calls go to the web app's own origin and are proxied by Vercel to the API. Browser history on a shared computer will show that HATUA was opened (one URL, no per-tab paths); a private window avoids that. Search engines are asked not to index the pilot (`noindex`).
+
+Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure (Vercel, including the `hatua-web` proxy for browser users, and Cloudflare once the edge cache is deployed); describe this accurately when drafting a public privacy notice.
 
 Server-side data (pilot deployment, 2026-10-18): public directory entries and staff admin accounts only, in Neon Postgres in Frankfurt (EU), served from Vercel functions in Frankfurt. Cloudflare caches only public `/api/v1/` responses for up to 5 minutes (1 hour if the origin is down) and never sees admin traffic. Review cross-border transfer obligations under Kenya's Data Protection Act before any personal data is stored server-side.
 

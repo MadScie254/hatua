@@ -35,5 +35,10 @@
 
 | 2026-10-18 | Replace `flutter_secure_storage` with a ~60-line Keystore AES-GCM vault (`GoalVault.kt`) | v11's RSA-OAEP key-wrapping init failed on the owner's pilot phone on first launch (cause not identifiable remotely: candidates were the hidden `AndroidKeyStoreBCWorkaround` provider and a self-signed cert valid past 2049). The plugin's AES alternative forces biometric/PIN auth on secured phones. Our vault: one AES-256-GCM Keystore key, no auth, no RSA, no certificates |
 | 2026-10-18 | Secure-storage failure disables only My Plan, never the app | The directory and 1192 must stay reachable whatever happens to a phone's Keystore; My Plan shows the technical error so testers can report it |
+| 2026-10-18 | Web app from the same Flutter code, Vercel project `hatua-web` (root `mobile/`) | Owner asked for a web version. One codebase, so listings, copy and safety cards stay identical. Rejected: a separate web frontend (second UI to keep in sync) |
+| 2026-10-18 | Web calls its own origin; Vercel rewrites `/api/*` to `hatua-api` | No CORS on the API, `connect-src 'self'` CSP, a later custom domain needs no app change. Cost: browser traffic reaches Django via Vercel's proxy (check client-IP handling for the throttle) |
+| 2026-10-18 | No goals on the web | Browsers lack a hardware-backed key store; a key held by the same profile as the ciphertext adds no real protection, so storing goals there would be a false promise. Rejected: WebCrypto + IndexedDB "encryption" |
+| 2026-10-18 | Self-host CanvasKit and fonts (`--no-web-resources-cdn`, overridden `fontFallbackBaseUrl`) | Opening a support app should not notify Google's CDNs. Cost: ~3.1 MB first load from Vercel instead of a possibly-cached CDN copy (browser cache partitioning removes most of that benefit anyway) |
+| 2026-10-18 | Web build is `noindex` during the pilot | Directory is empty and copy is unreviewed; remove at public launch |
 
 Next maintainer: append entries for non-trivial scope, permission, storage, identity and integration changes. Include rejected alternatives and trade-offs where important.

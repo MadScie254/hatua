@@ -1,0 +1,36 @@
+{
+    "name": "HATUA",
+    "short_name": "HATUA",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#F5F7F5",
+    "theme_color": "#087F66",
+    "description": "Verified opportunities and confidential support information in Kenya.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "lang": "en"
+}

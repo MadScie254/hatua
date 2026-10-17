@@ -11,6 +11,7 @@ import 'package:hatua_app/src/data/local_store.dart';
 import 'package:hatua_app/src/screens/explore_screen.dart';
 import 'package:hatua_app/src/screens/home_screen.dart';
 import 'package:hatua_app/src/screens/plan_screen.dart';
+import 'package:hatua_app/src/screens/settings_screen.dart';
 import 'package:hatua_app/src/screens/support_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -213,6 +214,38 @@ void main() {
       vault.failWith = null;
       await tapVisible(tester, find.widgetWithText(FilledButton, 'Retry'));
       expect(find.text('Private'), findsOneWidget);
+    });
+  });
+
+  group('Web build (no secure key store)', () {
+    testWidgets('My Plan explains goals live in the Android app and offers no input', (tester) async {
+      final webStore = LocalStore(vault: FakeGoalVault(isSupported: false));
+      await webStore.load();
+      expect(webStore.goalsStatus, GoalsStatus.unsupported);
+      await tester.pumpWidget(localized(PlanScreen(store: webStore)));
+      await tester.pumpAndSettle();
+      expect(find.text('My Plan works in the Android app'), findsOneWidget);
+      expect(find.textContaining('encrypted storage'), findsNothing,
+          reason: 'the intro must not promise storage this build does not have');
+      expect(find.byType(TextField), findsNothing);
+      await expectLater(webStore.addGoal('x'), throwsStateError);
+    });
+
+    testWidgets('Settings describes browser storage instead of encrypted goals', (tester) async {
+      useTallPhone(tester);
+      final webStore = LocalStore(vault: FakeGoalVault(isSupported: false));
+      await webStore.load();
+      await tester.pumpWidget(localized(SettingsScreen(store: webStore)));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('This web version does not store goals'), findsOneWidget);
+      expect(find.textContaining('Goals are stored in encrypted device storage'), findsNothing);
+    });
+
+    testWidgets('Settings on Android keeps the encrypted-goals summary', (tester) async {
+      useTallPhone(tester);
+      await tester.pumpWidget(localized(SettingsScreen(store: store)));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Goals are stored in encrypted device storage'), findsOneWidget);
     });
   });
 

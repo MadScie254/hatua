@@ -727,6 +727,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Technical details'**
   String get technicalDetails;
+
+  /// No description provided for @planUnsupportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Plan works in the Android app'**
+  String get planUnsupportedTitle;
+
+  /// No description provided for @planUnsupportedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Private goals are encrypted with your phone\'s secure hardware. Browsers cannot offer that protection, so this web version does not store goals. Everything else works here.'**
+  String get planUnsupportedBody;
+
+  /// Privacy summary on platforms without secure goal storage (the web build).
+  ///
+  /// In en, this message translates to:
+  /// **'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
+  String get settingsPrivacyBodyNoGoals;
 }
 
 class _AppLocalizationsDelegate

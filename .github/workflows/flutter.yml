@@ -87,3 +87,23 @@ jobs:
           echo "$tree" | grep -q 'dataExtractionRules'
           # The debug-only cleartext config must not leak into release.
           ! echo "$tree" | grep -q -e 'networkSecurityConfig' -e 'usesCleartextTraffic(0x010104ec)=true'
+
+  build-web:
+    needs: analyze-test
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter --disable-analytics
+      - run: flutter pub get --enforce-lockfile
+      - name: Build the web app exactly as Vercel does, then check it
+        run: bash tool/web_build.sh
+      - name: The Vercel install script pins the same Flutter version as CI
+        run: grep -q "FLUTTER_VERSION=\"${FLUTTER_VERSION}\"" tool/web_install.sh

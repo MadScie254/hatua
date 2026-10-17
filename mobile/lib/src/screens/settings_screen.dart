@@ -50,7 +50,9 @@ class SettingsScreen extends StatelessWidget {
           child: ListTile(
             leading: const Icon(Icons.shield_outlined),
             title: Text(l10n.settingsPrivacyTitle),
-            subtitle: Text(l10n.settingsPrivacyBody),
+            subtitle: Text(store.goalsStatus == GoalsStatus.unsupported
+                ? l10n.settingsPrivacyBodyNoGoals
+                : l10n.settingsPrivacyBody),
           ),
         ),
         Card(

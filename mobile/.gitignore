@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Flutter SDK installed by tool/web_install.sh (Vercel builds)
+/.flutter-sdk/

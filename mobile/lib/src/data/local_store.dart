@@ -8,7 +8,9 @@ import 'catalog_repository.dart';
 import 'counties.dart';
 import 'goal_vault.dart';
 
-enum GoalsStatus { ready, unavailable }
+/// ready: goals work. unavailable: the vault failed on this device (see [LocalStore.goalsError]).
+/// unsupported: this platform has no secure key store (web), so goals are never stored.
+enum GoalsStatus { ready, unavailable, unsupported }
 
 /// Everything HATUA keeps on the device. Nothing here is sent to the backend.
 ///
@@ -80,12 +82,18 @@ class LocalStore extends ChangeNotifier {
       // A broken key that cannot be deleted will surface again on the next save.
     }
     _goals = [];
-    _goalsStatus = GoalsStatus.ready;
+    _goalsStatus = _vault.isSupported ? GoalsStatus.ready : GoalsStatus.unsupported;
     _goalsError = null;
     notifyListeners();
   }
 
   Future<void> _loadGoals(SharedPreferences prefs) async {
+    if (!_vault.isSupported) {
+      _goals = [];
+      _goalsStatus = GoalsStatus.unsupported;
+      _goalsError = null;
+      return;
+    }
     final blob = prefs.getString(goalsKey);
     if (blob == null) {
       _goals = [];
@@ -159,7 +167,7 @@ class LocalStore extends ChangeNotifier {
       await prefs.remove(key);
     }
     _goals = [];
-    _goalsStatus = GoalsStatus.ready;
+    _goalsStatus = _vault.isSupported ? GoalsStatus.ready : GoalsStatus.unsupported;
     _goalsError = null;
     _savedIds.clear();
     _county = null;

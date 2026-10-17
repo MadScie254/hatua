@@ -23,11 +23,12 @@ You are continuing **HATUA**, a Kenya-first Android product for verified economi
 - `backend/directory/admin.py`: staff curation with state filter, reviewer recording and "Revoke now"; not a partner dashboard.
 - Mobile `CatalogRepository`: read-only API, 24h public offline copy, https-only in release, reports network/cache/unavailable.
 - Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
+- Web: `mobile/web/` (branding, loading page with 1192, `flutter_bootstrap.js`), `mobile/vercel.json` (CSP, `/api` rewrite), `mobile/tool/web_*.sh`. On the web `CatalogRepository` calls its own origin and `GoalVault.isSupported` is false (My Plan off). Keep the build free of third-party requests (`--no-web-resources-cdn`, `tool/check_web_build.sh`).
 - Mobile strings: `mobile/lib/l10n/app_en.arb` (template) and `app_sw.arb` (**draft** Kiswahili). Never hard-code UI text; run `flutter gen-l10n` and commit the generated files.
 
 ## Deployment
 
-Live pilot API: https://hatua-api.vercel.app (Vercel project `hatua-api`, root `backend/`, Neon Postgres, functions in fra1). Pushing to `main` deploys production; `backend/build.py` migrates (production only) and creates the first superuser. Cloudflare edge cache lives in `edge/` (deployed manually with wrangler). Never commit secrets or the admin path (`DJANGO_ADMIN_URL`). Runbook: `docs/DEPLOYMENT.md`.
+Live pilot API: https://hatua-api.vercel.app (Vercel project `hatua-api`, root `backend/`, Neon Postgres, functions in fra1). Pushing to `main` deploys production; `backend/build.py` migrates (production only) and creates the first superuser. Web app: https://hatua-web.vercel.app (Vercel project `hatua-web`, root `mobile/`, Flutter installed at build time by `tool/web_install.sh`; skipped when `mobile/` is unchanged). Cloudflare edge cache lives in `edge/` (deployed manually with wrangler). Never commit secrets or the admin path (`DJANGO_ADMIN_URL`). Runbook: `docs/DEPLOYMENT.md`.
 
 ## Existing API
 
@@ -43,7 +44,7 @@ Backend: create a Python venv, install `backend/requirements-dev.txt`, export `D
 
 ## Validation status (updated 2026-10-18)
 
-Locally verified: backend migrations/check/35 tests/ruff, Flutter analyze/45 tests, edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
+Locally verified: backend migrations/check/35 tests/ruff, Flutter analyze/48 tests, web release build checked in headless Chromium (CSP, no third-party requests), edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
 
 ## Next PRs (suggested sequence)
 

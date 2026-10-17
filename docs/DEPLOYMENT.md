@@ -1,8 +1,9 @@
 # Deployment runbook
 
-**Status (2026-10-18):** the API is live on Vercel with a Neon Postgres database. The Cloudflare edge cache is written and tested but must be deployed once by the owner (step 4). This is a **pilot/staging** deployment: the directory is empty until staff verify real entries. It is not a public launch (see `docs/QUALITY_GATES.md`).
+**Status (2026-10-18):** the API is live on Vercel with a Neon Postgres database, and the same Flutter app is live as a web app (section 6). The Cloudflare edge cache is written and tested but must be deployed once by the owner (step 4). This is a **pilot/staging** deployment: the directory is empty until staff verify real entries. It is not a public launch (see `docs/QUALITY_GATES.md`).
 
 ```text
+Browser ─────https─▶ Vercel "hatua-web" (static Flutter web build) ──/api/* rewrite──▶ Vercel "hatua-api"
 Android app ──https──▶ Cloudflare Worker "hatua-api" (edge cache, optional) ──▶ Vercel "hatua-api" (Django, fra1) ──▶ Neon Postgres (Frankfurt, eu-central-1)
 Staff browser ─https─▶ Vercel directly (admin is never proxied or cached by Cloudflare)
 ```
@@ -13,6 +14,7 @@ Staff browser ─https─▶ Vercel directly (admin is never proxied or cached b
 | Staff admin | `https://hatua-api.vercel.app/<DJANGO_ADMIN_URL>/` | Path is in Vercel → hatua-api → Settings → Environment Variables. Deliberately **not** written in this public repo. `/admin/` returns 404. |
 | Vercel project | `hatua-api` (team "madscie254's projects"), root directory `backend/`, Django preset | Git-connected: every push to `main` deploys production. |
 | Database | Neon (Vercel Marketplace store `hatua-db`), free plan | Vercel injects `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct). |
+| Web app | `https://hatua-web.vercel.app` | Vercel project `hatua-web`, root directory `mobile/`, static output; see section 6. |
 | Edge cache | Cloudflare Worker `hatua-api` from `edge/` | 5-minute cache of public GETs; serves last good copy for up to 1 h if Vercel/Neon fail. |
 
 ## 1. Environment variables (Vercel → hatua-api → Settings → Environment Variables)
@@ -95,14 +97,38 @@ flutter build apk --release --target-platform android-arm64,android-arm \
 
 Release builds already default to `https://hatua-api.vercel.app` when `HATUA_API_URL` is not given (debug builds default to the emulator's local server). Output: `mobile/build/app/outputs/flutter-apk/app-release.apk`. It is signed with the Flutter debug key and uses the placeholder ID `com.example.hatua_app`: fine for sideloading to pilot testers, **not** for Google Play (needs a real application ID, a release key, an icon and a privacy policy).
 
-## 6. Operating it
+## 6. The web app (`hatua-web`)
 
-- Logs: Vercel → hatua-api → Logs (Django warnings/errors go to stdout). Edge: `cd edge && npm run tail`.
+The web app is the same Flutter code built for browsers (`mobile/web/`, `mobile/vercel.json`). It is a convenience for people without the APK; the Android app stays the main, data-light route.
+
+What a deploy does (push or merge to `main` that touches `mobile/`; other pushes are skipped by `ignoreCommand`):
+
+1. `tool/web_install.sh` clones Flutter **3.47.7** (same pin as CI) into `mobile/.flutter-sdk` and runs `flutter pub get` (about 1 minute; installs `unzip` with `dnf` if the build image lacks it);
+2. `tool/web_build.sh` checks the committed l10n is current, runs `flutter build web --release --no-web-resources-cdn --csp --no-source-maps`, then `tool/check_web_build.sh` (local CanvasKit, bundled Roboto, overridden font fallback, 1192 line in the loading page, no source maps);
+3. Vercel serves `build/web` as static files. `/api/*` is rewritten (proxied) to `https://hatua-api.vercel.app/api/*`, so the browser only ever talks to the web app's own origin: no CORS on the API, `connect-src 'self'` in the CSP.
+
+Headers (all in `mobile/vercel.json`): strict Content-Security-Policy (`script-src 'self' 'wasm-unsafe-eval'`, no third-party origins, `frame-ancestors 'none'`), `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, `Permissions-Policy` denying camera/microphone/location/payment, and `X-Robots-Tag: noindex` (plus a `robots` meta tag) while this is a pilot. Remove both noindex markers only at public launch.
+
+Differences from the Android app:
+
+- **My Plan is off.** Browsers have no hardware-backed key store, so the web build never stores goals; the tab says so and points to the Android app.
+- Saved listings, county, language and the 24-hour public directory copy live in the browser's `localStorage` for that site.
+- First visit downloads about **3.1 MB** (measured on production with Chromium; 8.9 MB before compression: CanvasKit ~5 MB, app ~3 MB). The browser then revalidates files with ETags, so repeat visits are small, but there is no offline start: the page itself needs a connection.
+- No third-party requests: CanvasKit and Roboto are served from `hatua-web`, and the engine's Noto fallback-font URL points at `hatua-web` too (nothing is hosted there, so a character Roboto lacks shows as a box rather than triggering a download from Google).
+
+Rollback: Vercel → hatua-web → Deployments → previous production deployment → **Promote**. Previews (other branches) are protected by Vercel Authentication; production is public.
+
+Custom domain later: add it to `hatua-web` in Vercel. Nothing else changes, because the app calls its own origin.
+
+## 7. Operating it
+
+- Logs: Vercel → hatua-api → Logs (Django warnings/errors go to stdout). The web app is static; its only server-side part is the `/api` rewrite. Edge: `cd edge && npm run tail`.
 - Health: `https://hatua-api.vercel.app/api/v1/health/` (no database access).
 - Rate limit: anonymous requests are throttled at 60/min per client IP by Django. Requests arriving through the Worker share Cloudflare's egress addresses, which is fine at pilot scale because the edge cache absorbs most traffic. If origin traffic grows, give the Worker a secret header and exempt it from the throttle.
 - Neon free plan: compute scales to zero after 5 minutes idle (first request afterwards takes ~1 s), 1 GB storage, 6-hour history window. There are no long-term backups on the free plan, so take a periodic `pg_dump` using `DATABASE_URL_UNPOOLED` (Vercel → Storage → hatua-db → connection details) once real data exists.
+- Rate limit and the web app: browser requests reach Django through Vercel's rewrite, so check which client address DRF sees before raising traffic (see `docs/HANDOFF.md`, known risks).
 - Plans in use: Vercel Hobby (non-commercial use only; move to Pro before any paid partner plan), Neon Free, Cloudflare Workers Free.
 
-## 7. Data location
+## 8. Data location
 
-The server stores only public directory entries and staff accounts; no user data. The database is in Frankfurt (EU) and functions run in Frankfurt; Cloudflare caches public listings at edge locations. Record this in the privacy notice and review cross-border transfer requirements under Kenya's Data Protection Act before storing any personal data server-side.
+The server stores only public directory entries and staff accounts; no user data. The web app is static files plus a proxy and stores nothing server-side. The database is in Frankfurt (EU) and functions run in Frankfurt; Cloudflare caches public listings at edge locations. Record this in the privacy notice and review cross-border transfer requirements under Kenya's Data Protection Act before storing any personal data server-side.
