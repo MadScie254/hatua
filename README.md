@@ -6,24 +6,24 @@ Kenya-first Android project connecting people to **verified economic opportuniti
 
 ## What's here today
 
-- Flutter Android-first **starter UI**: Home, Explore, Support, My Plan, Settings.
-- Guest browsing; no signup, no collected health history, no AI counsellor.
-- Public Django REST API: opportunities, support resources, health check.
-- Unverified/inactive records are **never published**; expired opportunities excluded.
-- Django Admin entry and verification workflow for staff (internal only).
-- Offline fallback for cached **public** listings; encrypted local goal storage.
-- API and Flutter test files, CI workflow templates, product/privacy/architecture docs.
+- Flutter Android-first app (runner tracked): Home, Explore, Support, My Plan, Settings, with county/category filters, offline and error states, and English plus **draft** Kiswahili.
+- Guest browsing; no signup, no collected health history, no AI counsellor. Only Android permission: `INTERNET`. Backups disabled.
+- Public Django REST API: opportunities, support resources, health check, with county/category/kind filters.
+- Only **verified, active and recently re-verified** records are published (90-day window by default); expired opportunities excluded.
+- Django Admin for staff (internal only): provenance required before verification, reviewer recorded, "Revoke now".
+- Offline fallback for **public** listings (24 h, then deleted); encrypted local goal storage.
+- Tests (21 backend, 38 Flutter, all passing locally), CI workflows, product/privacy/architecture docs.
 - Claude handoff: [`CLAUDE.md`](CLAUDE.md), [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
 ### What's deliberately NOT built
 
-Real provider catalogue, user accounts, applications, referrals, partner billing, full Kiswahili localisation, live notification system, AI matching, clinical tools, iOS app, production infrastructure. Do not advertise these as implemented.
+Real provider catalogue, user accounts, applications, referrals, partner billing, **reviewed** Kiswahili, live notification system, AI matching, clinical tools, iOS app, production infrastructure, a release-signed APK. Do not advertise these as implemented.
 
 ## Repository layout
 
 ```text
 backend/       Django API + staff-managed directory + tests
-mobile/        Flutter source (Android native runner generated on developer machine)
+mobile/        Flutter app incl. tracked Android runner, l10n ARB files, tests, screenshot tool
 docs/          requirements, architecture, privacy, decisions, business, roadmap, handoff
 .github/       CI definitions
 scripts/       developer bootstrap scripts
@@ -62,14 +62,11 @@ Both directory lists start EMPTY by design. Admin records must be reviewed and e
 
 ```bash
 cd mobile
-flutter create --platforms android --project-name hatua_app .
 flutter pub get
 flutter run --dart-define=HATUA_API_URL=http://10.0.2.2:8000
 ```
 
-`10.0.2.2` reaches the host machine from the standard Android emulator. On a physical Android device, use your computer's reachable LAN IP and configure appropriate development networking. For a shipped app use an HTTPS backend address. **The Flutter SDK is not present in the bootstrap environment; compilation is unverified here.**
-
-To use local `http://` during development, Android may need debug-only cleartext allowances. Never relax production HTTPS requirements; see [`docs/BUILD_GUIDE.md`](docs/BUILD_GUIDE.md).
+The Android runner is already in the repo; **do not run `flutter create`** over it. `10.0.2.2` reaches the host machine from the standard Android emulator. On a USB-connected phone, run `adb reverse tcp:8000 tcp:8000` and use `HATUA_API_URL=http://127.0.0.1:8000`. Debug builds allow plain http only to those local hosts. Release builds refuse any non-https API URL. See [`docs/BUILD_GUIDE.md`](docs/BUILD_GUIDE.md).
 
 ### 3. Checks
 
@@ -81,9 +78,12 @@ python manage.py check
 ruff check .
 
 cd ../mobile
+flutter gen-l10n          # regenerate after editing lib/l10n/*.arb, commit the output
 flutter analyze
 flutter test
 ```
+
+Latest local results and anything not yet verified: [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
 ## Safety and trust
 

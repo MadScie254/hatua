@@ -29,12 +29,18 @@ HATUA concerns financial vulnerability and substance-use support. Its credibilit
 
 | Data | Location | Shared with HATUA backend? |
 |---|---|---|
-| Public opportunity and provider directory | API, local cache | Public content only |
-| Bookmarked public listing IDs | Device preferences | No |
-| Personal goal titles / completion state | Encrypted device storage | No |
-| Personal identifier, location, recovery history | Not collected | No |
+| Public opportunity and provider directory | API, local cache (max 24 h, then deleted) | Public content only |
+| Bookmarked opportunity IDs (never support resources) | Device preferences | No |
+| Chosen county (manual, optional) | Device preferences | No. The app filters on the device and does not send the county |
+| Chosen app language | Device preferences | No |
+| Personal goal titles / completion state | Encrypted device storage (Keystore-backed) | No |
+| Personal identifier, GPS location, recovery history | Not collected | No |
 
-Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure; describe this accurately when drafting a public privacy notice. Android system and OS-level backup/telemetry require separate review.
+Requesting online public listings exposes typical network metadata such as IP address to hosting infrastructure; describe this accurately when drafting a public privacy notice.
+
+Android backup: `allowBackup="false"`, `fullBackupContent="false"` and `data_extraction_rules.xml` exclude all app data from Google cloud backup and device-to-device transfer, so goals never leave the phone through backups (verified in the manifest, not yet on a device). The only Android permission requested is `INTERNET`; opening the dialer for 1192 or a provider needs no phone permission and places no call automatically.
+
+Support-seeking leaves minimal trace on the device by design: support resources cannot be bookmarked, and the Support tab stores nothing. A shared or inspected phone still shows the app itself and its recent screen in the app switcher; consider `FLAG_SECURE` or a neutral app-switcher preview after user research.
 
 ## Work blocked until review
 

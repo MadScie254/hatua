@@ -18,27 +18,31 @@ flowchart TD
 - Local debug DB SQLite; PostgreSQL production DB via `DATABASE_URL`.
 - Staff uses Django Admin for publishing; public API only returns verified and active records.
 - No authentication or personal server-side data in v0.1. Staff Django Admin authentication only.
-- Public cache in `shared_preferences`. Personal goals encrypted using OS-protected storage via `flutter_secure_storage`. Android backup behaviour requires pre-release review.
-- No background GPS, SMS, WhatsApp, contacts or accessibility service permissions.
+- Public cache in `shared_preferences` (24 h, then deleted). Personal goals encrypted using OS-protected storage via `flutter_secure_storage` 11. Android backup and device transfer disabled for all app data.
+- No background GPS, SMS, WhatsApp, contacts or accessibility service permissions. The only permission is `INTERNET`.
+- Release builds refuse non-https API URLs; cleartext is allowed only in debug builds and only to emulator/localhost hosts.
+- UI strings via Flutter gen-l10n (`mobile/lib/l10n`), English template plus draft Kiswahili.
 
 ## Application modules
 
 - `directory`: vetted public listings and resources.
-- `mobile/src/data/catalog_repository.dart`: remote fetch, public offline cache.
-- `mobile/src/data/local_store.dart`: on-device bookmarks and goals.
-- `mobile/src/screens`: Home, Explore, Support, My Plan, Settings.
+- `directory/counties.py` ↔ `mobile/lib/src/data/counties.dart`: shared county list.
+- `mobile/lib/src/data/catalog_repository.dart`: remote fetch, public offline cache, network/cache/unavailable states.
+- `mobile/lib/src/data/local_store.dart`: on-device bookmarks, county/language prefs and encrypted goals.
+- `mobile/lib/src/widgets/directory_widgets.dart`: status banner, county picker, chips, link/tel sanitising.
+- `mobile/lib/src/screens`: Home, Explore, Support, My Plan, Settings (tabs built on first visit).
 
 ## Publication invariant
 
-For every public record: `is_active=True` and `is_verified=True`. Opportunity deadline must be null or today/future (server local date). Admin publication should eventually require `source_url` plus `last_verified_at` and periodic re-review. The current flags are necessary but NOT sufficient assurance of real-world truth.
+For every public record: `is_active=True`, `is_verified=True`, and `last_verified_at` within `HATUA_VERIFICATION_MAX_AGE_DAYS` (default 90) and not in the future. Opportunity deadline must be null or today/future (server local date). Admin forms require `source_url` and `last_verified_at` before verification and record the reviewer. These checks are necessary but NOT sufficient assurance of real-world truth.
 
 ## Threats to revisit before beta
 
-- Stale cached listings after admin revocation; offline list must have finite TTL, visible staleness state, and source recheck. Consider emergency blacklist sync for known scams.
+- Stale cached listings after admin revocation: mitigated by the 24 h TTL with deletion and a visible save time. A revoked listing can still show offline for up to 24 h; consider an emergency blocklist sync for known scams.
 - External URLs and telephone link safety; validate `https` and approved official domains where possible, and don't render HTML from descriptions.
 - Django Admin exposed publicly; use MFA, rate limits, audit, separate internal address/VPN, and least privilege.
 - Unencrypted SQLite and browser/client analytics; no sensitive notes or medical records in general-purpose stores.
-- Secure storage backup restore inconsistency, device sharing, screen previews, clipboard leakage.
+- Device sharing, app-switcher screen previews, clipboard leakage. (Backup-restore inconsistency mitigated by disabling backup.)
 - Sensitive data segregation and processing contracts prior to any referral feature.
 
 ## Backend deployment rules
