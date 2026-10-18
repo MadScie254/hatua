@@ -54,7 +54,8 @@
 - [ ] CV writer and templates; user controls content and exports.
 - [ ] Optional progress reminders and settings, user-revocable.
 - [ ] Mentorship by vetted, supervised adults with moderation procedures.
-- [ ] Full opportunity application tracker and verified follow-ups.
+- [x] Encrypted on-device application status tracker (interested/applied/interview/offered/closed), migration from old goal vault; Android only (feature branch pending validation).
+- [ ] Cross-device application syncing and verified follow-ups (only after privacy review and opt-in).
 
 ## Phase 4: AI, only if problem evidence supports it
 

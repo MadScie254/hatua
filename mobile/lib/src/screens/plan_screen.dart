@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/local_store.dart';
+import '../models/application_record.dart';
 import '../l10n_helpers.dart';
 
 /// Private goals. Stored only as Keystore-encrypted ciphertext on this device; never synced
@@ -70,6 +71,17 @@ class _PlanScreenState extends State<PlanScreen> {
       ),
     );
     if (approved == true) await widget.store.resetGoals();
+  }
+
+  String _stageLabel(ApplicationStage stage) {
+    final l10n = context.l10n;
+    return switch (stage) {
+      ApplicationStage.interested => l10n.applicationStageInterested,
+      ApplicationStage.applied => l10n.applicationStageApplied,
+      ApplicationStage.interview => l10n.applicationStageInterview,
+      ApplicationStage.offered => l10n.applicationStageOffered,
+      ApplicationStage.closed => l10n.applicationStageClosed,
+    };
   }
 
   @override
@@ -175,6 +187,50 @@ class _PlanScreenState extends State<PlanScreen> {
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _guard(() => store.removeGoal(goal.id), l10n.planDeleteFailed),
             ),
+          ),
+        ),
+      const SizedBox(height: 24),
+      Semantics(header: true, child: Text(l10n.planApplicationsTitle, style: theme.textTheme.titleLarge)),
+      const SizedBox(height: 6),
+      Text(l10n.planApplicationsIntro, style: theme.textTheme.bodySmall),
+      const SizedBox(height: 12),
+      if (store.applications.isEmpty)
+        Card(child: Padding(padding: const EdgeInsets.all(16), child: Text(l10n.planApplicationsEmpty))),
+      for (final record in store.applications)
+        Card(
+          key: ValueKey(record.opportunityId),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Expanded(child: Text(record.title, style: theme.textTheme.titleMedium)),
+                IconButton(
+                  tooltip: l10n.planApplicationRemove,
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _guard(
+                    () => store.removeApplication(record.opportunityId),
+                    l10n.planDeleteFailed,
+                  ),
+                ),
+              ]),
+              Text(record.organisation, style: theme.textTheme.bodySmall),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<ApplicationStage>(
+                key: ValueKey('${record.opportunityId}:${record.stage.name}'),
+                initialValue: record.stage,
+                isExpanded: true,
+                decoration: InputDecoration(labelText: l10n.planApplicationStatus),
+                items: [
+                  for (final stage in ApplicationStage.values)
+                    DropdownMenuItem(value: stage, child: Text(_stageLabel(stage))),
+                ],
+                onChanged: (stage) {
+                  if (stage != null) {
+                    _guard(() => store.updateApplicationStage(record.opportunityId, stage), l10n.planUpdateFailed);
+                  }
+                },
+              ),
+            ]),
           ),
         ),
     ]);

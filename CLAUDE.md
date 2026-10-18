@@ -22,7 +22,7 @@ You are continuing **HATUA**, a Kenya-first Android product for verified economi
 - `backend/directory/views.py`: GET-only public endpoints sharing one `PublicDirectoryList` base.
 - `backend/directory/admin.py`: staff curation with state filter, reviewer recording and "Revoke now"; not a partner dashboard.
 - Mobile `CatalogRepository`: read-only API, 24h public offline copy, https-only in release, reports network/cache/unavailable.
-- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
+- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals AND local application statuses encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
 - Web: `mobile/web/` (branding, loading page with 1192, `flutter_bootstrap.js`), `mobile/vercel.json` (CSP, `/api` rewrite), `mobile/tool/web_*.sh`. On the web `CatalogRepository` calls its own origin and `GoalVault.isSupported` is false (My Plan off). Keep the build free of third-party requests (`--no-web-resources-cdn`, `tool/check_web_build.sh`).
 - Mobile strings: `mobile/lib/l10n/app_en.arb` (template) and `app_sw.arb` (**draft** Kiswahili). Never hard-code UI text; run `flutter gen-l10n` and commit the generated files.
 
