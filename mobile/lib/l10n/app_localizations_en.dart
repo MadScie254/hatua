@@ -373,6 +373,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsPrivacyBodyNoGoals =>
       'This web version does not store goals or application tracking. Saved listings, your county and language are kept in this browser, alongside public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.';
+
   @override
   String get exploreTrack => 'Track application';
 

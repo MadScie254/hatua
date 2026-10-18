@@ -376,6 +376,7 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get settingsPrivacyBodyNoGoals =>
       'Toleo hili la wavuti halihifadhi malengo wala ufuatiliaji wa maombi. Fursa zilizohifadhiwa, kaunti, lugha na data ya umma hukaa kwenye kivinjari hiki. Hakuna historia ya matibabu inayokusanywa.';
+
   @override
   String get exploreTrack => 'Fuatilia ombi';
 

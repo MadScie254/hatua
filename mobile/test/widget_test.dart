@@ -238,14 +238,14 @@ void main() {
       await tester.pumpWidget(localized(SettingsScreen(store: webStore)));
       await tester.pumpAndSettle();
       expect(find.textContaining('This web version does not store goals'), findsOneWidget);
-      expect(find.textContaining('Goals are stored in encrypted device storage'), findsNothing);
+      expect(find.textContaining('encrypted on Android'), findsNothing);
     });
 
     testWidgets('Settings on Android keeps the encrypted-goals summary', (tester) async {
       useTallPhone(tester);
       await tester.pumpWidget(localized(SettingsScreen(store: store)));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Goals are stored in encrypted device storage'), findsOneWidget);
+      expect(find.textContaining('encrypted on Android'), findsOneWidget);
     });
   });
 
