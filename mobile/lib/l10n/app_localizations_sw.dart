@@ -371,11 +371,11 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get planUnsupportedBody =>
-      'Malengo binafsi husimbwa kwa kutumia maunzi salama ya simu yako. Vivinjari haviwezi kutoa ulinzi huo, kwa hivyo toleo hili la wavuti halihifadhi malengo. Sehemu nyingine zote zinafanya kazi hapa.';
+      'Malengo binafsi na ufuatiliaji wa maombi vinahitaji hifadhi salama ya Android. Toleo hili la wavuti halihifadhi hivyo.';
 
   @override
   String get settingsPrivacyBodyNoGoals =>
-      'Toleo hili la wavuti halihifadhi malengo. Orodha ulizohifadhi, kaunti yako na lugha yako huhifadhiwa kwenye kivinjari hiki pekee, na taarifa za orodha ya umma kwa hadi saa 24. Hakuna kinachopakiwa na hakuna historia ya matibabu inayokusanywa.';
+      'Toleo hili la wavuti halihifadhi malengo wala ufuatiliaji wa maombi. Fursa zilizohifadhiwa, kaunti, lugha na data ya umma hukaa kwenye kivinjari hiki. Hakuna historia ya matibabu inayokusanywa.';
   @override
   String get exploreTrack => 'Fuatilia ombi';
 

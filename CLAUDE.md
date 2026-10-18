@@ -69,3 +69,14 @@ See `docs/DECISIONS.md`. Especially: Android first, guest-first, public verified
 ## Copy-paste continuation prompt
 
 > Read `CLAUDE.md`, `README.md`, `docs/HANDOFF.md`, `docs/ROADMAP.md` and `docs/SAFETY_PRIVACY.md`. Inspect the repo rather than assuming code is tested. First bootstrap Flutter Android platform, install backend deps, run the specified tests/static analysis/migration check, and fix issues. Commit changes in small coherent commits. Keep guest access, verified-only publication, and recovery-data isolation. Report exactly what passed, what failed, any safety/security concerns, and update `docs/HANDOFF.md` so another assistant can take over.
+
+## Pending features and GitHub delivery queue (2026-10-18)
+
+- **Draft PR #7** (`feature/private-application-tracker`): encrypted Android application status tracking with migration. It is intentionally **unmerged and untested in Flutter**; run gen-l10n, analyzer, tests, and device smoke test before merging. Review the goal-vault reset wording because goals and application records share a key.
+- **Issue #8:** verified listings, guest pilot UX, suspicious-listing report, accessibility.
+- **Issue #9:** goal subtasks, reminders, CV builder, skills/financial modules.
+- **Issue #10:** addiction support and consented referrals, blocked on clinical/privacy review.
+- **Issue #11:** NGO partner dashboard and billing, blocked on partner agreements/security reviews.
+- **Issue #12:** optional low-cost AI search/matching, never using recovery data.
+
+Take one reviewed PR at a time; do not mark issues as implemented. GitHub Actions still needs billing lock resolved. Changes to `main` deploy to production.

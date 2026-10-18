@@ -368,11 +368,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planUnsupportedBody =>
-      'Private goals are encrypted with your phone\'s secure hardware. Browsers cannot offer that protection, so this web version does not store goals. Everything else works here.';
+      'Private goals and application tracking need Android secure storage. This web version does not store either. Other features still work here.';
 
   @override
   String get settingsPrivacyBodyNoGoals =>
-      'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.';
+      'This web version does not store goals or application tracking. Saved listings, your county and language are kept in this browser, alongside public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.';
   @override
   String get exploreTrack => 'Track application';
 

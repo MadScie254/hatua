@@ -737,13 +737,13 @@ abstract class AppLocalizations {
   /// No description provided for @planUnsupportedBody.
   ///
   /// In en, this message translates to:
-  /// **'Private goals are encrypted with your phone\'s secure hardware. Browsers cannot offer that protection, so this web version does not store goals. Everything else works here.'**
+  /// **'Private goals and application tracking need Android secure storage. This web version does not store either. Other features still work here.'**
   String get planUnsupportedBody;
 
   /// Privacy summary on platforms without secure goal storage (the web build).
   ///
   /// In en, this message translates to:
-  /// **'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
+  /// **'This web version does not store goals or application tracking. Saved listings, your county and language are kept in this browser, alongside public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
   String get settingsPrivacyBodyNoGoals;
 
   /// No description provided for @exploreTrack.
