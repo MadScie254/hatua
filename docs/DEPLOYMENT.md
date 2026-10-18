@@ -1,6 +1,6 @@
 # Deployment runbook
 
-**Status (2026-10-18):** the API is live on Vercel with a Neon Postgres database, and the same Flutter app is live as a web app (section 6). The Cloudflare edge cache is written and tested but must be deployed once by the owner (step 4). This is a **pilot/staging** deployment: the directory is empty until staff verify real entries. It is not a public launch (see `docs/QUALITY_GATES.md`).
+**Status (2026-10-18):** the API is live on Vercel with a Neon Postgres database, and the same Flutter app is live as a web app (section 6). The Cloudflare edge cache is written and tested but must be deployed once by the owner (step 4). This is a **pilot/staging** deployment. Since v0.2 the directory holds 109 real listings (10 opportunities, 99 support services) desk-checked against their official sources on 18 Oct 2026 and published with the owner's approval; they drop out automatically after 90 days unless re-checked. It is not a public launch (see `docs/QUALITY_GATES.md`).
 
 ```text
 Browser ─────https─▶ Vercel "hatua-web" (static Flutter web build) ──/api/* rewrite──▶ Vercel "hatua-api"
@@ -35,7 +35,7 @@ Staff browser ─https─▶ Vercel directly (admin is never proxied or cached b
 Push or merge to `main` → Vercel builds `backend/`:
 
 1. installs `requirements.txt` with Python 3.12 (`backend/.python-version`);
-2. runs `python build.py`: `check --deploy` (fails on errors), then **production only**: `migrate` over the direct (unpooled) connection, then `ensure_superuser` (creates the account only if missing; never changes an existing one);
+2. runs `python build.py`: `check --deploy` (fails on errors), then **production only**: `migrate` over the direct (unpooled) connection, `ensure_superuser` (creates the account only if missing; never changes an existing one), `load_directory_seed` (applies any new batch in `backend/directory/seed/` once; batches already applied are skipped, so staff edits and deletions stick) and `purge_reports` (deletes handled listing reports older than 90 days);
 3. runs `collectstatic` (Vercel does this automatically) and serves `/static/` from its CDN;
 4. deploys one Python function in `fra1` (Frankfurt), next to the database.
 
@@ -50,7 +50,9 @@ Rollback: Vercel → Deployments → pick the previous production deployment →
 3. Vercel → Environment Variables → **delete `DJANGO_SUPERUSER_PASSWORD`** (it is only needed for the first build).
 4. Optional hardening: rotate `DJANGO_SECRET_KEY` (generate with `python -c "import secrets; print(secrets.token_urlsafe(50))"`, update the variable, redeploy). This signs everyone out.
 
-Then add real, verified entries following `docs/CONTENT_VERIFICATION.md`. Each one needs a source URL and a check date before it can be marked verified.
+Then review what is already published (Admin → Opportunities / Support resources, filter "Published now"); records loaded from a seed batch say so in *Verification note*. Re-verify by phone where you can, add new entries following `docs/CONTENT_VERIFICATION.md`, and check **Listing reports** regularly: open the listing from a report, fix or revoke it, then mark the report handled.
+
+To add a batch of listings in bulk, add a JSON file to `backend/directory/seed/` (same shape as `2026-10-18-desk-check.json`, a new unique `name`), run `python manage.py load_directory_seed --dry-run` locally, then merge to `main`.
 
 ## 4. Deploy the Cloudflare edge cache (one time)
 

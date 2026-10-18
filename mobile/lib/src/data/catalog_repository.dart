@@ -20,6 +20,26 @@ enum CatalogSource {
   unavailable,
 }
 
+enum ReportTarget {
+  opportunity('opportunity'),
+  supportResource('support_resource');
+
+  const ReportTarget(this.code);
+  final String code;
+}
+
+/// Reason codes accepted by POST /api/v1/reports/ (backend ListingReport.Reason).
+enum ReportReason {
+  brokenLink('broken_link'),
+  wrongContact('wrong_contact'),
+  closed('closed'),
+  suspectedScam('suspected_scam'),
+  other('other');
+
+  const ReportReason(this.code);
+  final String code;
+}
+
 class CatalogResult<T> {
   const CatalogResult({required this.items, required this.source, this.fetchedAt});
 
@@ -93,6 +113,36 @@ class CatalogRepository {
 
   Future<CatalogResult<SupportResource>> resources() =>
       _fetch('/api/v1/support-resources/', resourcesCacheKey, SupportResource.fromJson);
+
+  /// Sends an anonymous "report a problem" for a public listing (POST /api/v1/reports/).
+  /// Nothing about the user is sent: only the listing, a reason code and an optional note.
+  /// Returns true when the server accepted the report.
+  Future<bool> report({
+    required ReportTarget target,
+    required String recordId,
+    required ReportReason reason,
+    String note = '',
+  }) async {
+    try {
+      final uri = Uri.parse('$baseUrl/api/v1/reports/');
+      if (requireHttps && uri.scheme != 'https') return false;
+      final response = await _client
+          .post(
+            uri,
+            headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            body: jsonEncode({
+              'record_type': target.code,
+              'record_id': recordId,
+              'reason': reason.code,
+              if (note.trim().isNotEmpty) 'note': note.trim(),
+            }),
+          )
+          .timeout(requestTimeout);
+      return response.statusCode == 201;
+    } catch (_) {
+      return false;
+    }
+  }
 
   void dispose() => _client.close();
 

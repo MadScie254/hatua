@@ -335,7 +335,7 @@ class AppLocalizationsSw extends AppLocalizations {
       'Imeshindikana kufuta data yote. Tafadhali jaribu tena.';
 
   @override
-  String get settingsVersion => 'HATUA v0.1.1 · Toleo la majaribio';
+  String get settingsVersion => 'HATUA v0.2.0, toleo la majaribio';
 
   @override
   String get settingsDisclaimer =>
@@ -421,4 +421,177 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get applicationStageClosed => 'Limefungwa';
+
+  @override
+  String get homeTalkNowTitle => 'Ongea na mtu sasa';
+
+  @override
+  String get homeTalkNowBody =>
+      'Simu ya msaada ya NACADA kuhusu pombe na dawa za kulevya, bila malipo, saa 24. Si huduma ya ambulensi.';
+
+  @override
+  String get homeCall1192 => 'Piga 1192';
+
+  @override
+  String get homeCountyChoose => 'Chagua kaunti yako';
+
+  @override
+  String homeCountySelected(String county) {
+    return 'Inaonyesha $county kwanza';
+  }
+
+  @override
+  String get changeCounty => 'Badilisha';
+
+  @override
+  String get detailsButton => 'Maelezo';
+
+  @override
+  String get detailAbout => 'Kuhusu';
+
+  @override
+  String get detailWhoCanApply => 'Nani anaweza kuomba';
+
+  @override
+  String get detailCost => 'Gharama';
+
+  @override
+  String get detailHowToApply => 'Jinsi ya kuomba';
+
+  @override
+  String get detailNoApplyLink =>
+      'Hakuna fomu ya mtandaoni. Tumia mawasiliano yaliyo kwenye maelezo hapo juu.';
+
+  @override
+  String get deadlineNone => 'Hakuna tarehe ya mwisho iliyotajwa';
+
+  @override
+  String deadlineIn(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Inafungwa baada ya siku $days',
+      one: 'Inafungwa kesho',
+      zero: 'Inafungwa leo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get copyToShare => 'Nakili ili kushiriki';
+
+  @override
+  String get copiedToShare =>
+      'Imenakiliwa. Ibandike kwenye ujumbe ili kushiriki.';
+
+  @override
+  String get reportProblem => 'Ripoti tatizo';
+
+  @override
+  String get reportTitle => 'Kuna shida gani na tangazo hili?';
+
+  @override
+  String get reportReasonBrokenLink => 'Kiungo hakifanyi kazi';
+
+  @override
+  String get reportReasonWrongContact => 'Nambari ya simu au anwani si sahihi';
+
+  @override
+  String get reportReasonClosed => 'Imefungwa, imejaa au haitolewi tena';
+
+  @override
+  String get reportReasonScam => 'Inaonekana kuwa ulaghai au inaomba pesa';
+
+  @override
+  String get reportReasonOther => 'Jambo lingine';
+
+  @override
+  String get reportNoteLabel => 'Maelezo (si lazima)';
+
+  @override
+  String get reportNoteHint => 'Usiweke jina lako wala nambari yako ya simu.';
+
+  @override
+  String get reportPrivacy =>
+      'Ripoti hazina majina. HATUA hairekodi aliyezituma.';
+
+  @override
+  String get reportSend => 'Tuma ripoti';
+
+  @override
+  String get reportSent => 'Ripoti imetumwa. Wafanyakazi wa HATUA wataikagua.';
+
+  @override
+  String get reportFailed =>
+      'Ripoti haikutumwa. Angalia mtandao wako kisha ujaribu tena.';
+
+  @override
+  String get supportHelplinesTitle => 'Simu za msaada unazoweza kupiga sasa';
+
+  @override
+  String get supportNearTitle => 'Matibabu na msaada karibu nawe';
+
+  @override
+  String get supportNearChooseCounty =>
+      'Chagua kaunti yako ili uone kwanza vituo vilivyoidhinishwa na NACADA vilivyo karibu nawe.';
+
+  @override
+  String supportNoneInCounty(String county) {
+    return 'Bado hakuna vituo vilivyoorodheshwa $county. Huduma za kaunti nyingine ziko hapa chini.';
+  }
+
+  @override
+  String get supportOtherCounties => 'Kaunti nyingine';
+
+  @override
+  String get supportMoreHelp => 'Msaada na taarifa zaidi';
+
+  @override
+  String get supportCopyNumber => 'Nakili nambari';
+
+  @override
+  String get numberCopied => 'Nambari imenakiliwa';
+
+  @override
+  String get supportDirections => 'Maelekezo ya njia';
+
+  @override
+  String get supportCallBefore =>
+      'Piga simu kabla ya kusafiri ili kuthibitisha saa za kazi, huduma na gharama.';
+
+  @override
+  String resultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Matokeo $count',
+      one: 'Tokeo 1',
+      zero: 'Hakuna matokeo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get welcomeLanguage => 'Chagua lugha yako';
+
+  @override
+  String get welcomePrivacyTitle => 'Faragha tangu mwanzo';
+
+  @override
+  String get welcomeNoAccount =>
+      'Hakuna akaunti wala ufuatiliaji. Tumia kila kitu kama mgeni.';
+
+  @override
+  String get welcomeOnDevice =>
+      'Kaunti yako na matangazo uliyohifadhi hubaki kwenye kifaa hiki.';
+
+  @override
+  String get welcomeSupportPrivate =>
+      'Huduma za msaada unazotazama hazihifadhiwi kamwe.';
+
+  @override
+  String get welcomeCounty => 'Kaunti yako (si lazima)';
+
+  @override
+  String get welcomeStart => 'Anza';
 }

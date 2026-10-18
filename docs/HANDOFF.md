@@ -12,7 +12,9 @@
 | **PR #2** | time-limited verification and admin workflow, mobile filters/offline states/en+sw strings | merged (`a09c562`) |
 | **PR #3** | Vercel-ready backend, `build.py`, `ensure_superuser`, Cloudflare Worker in `edge/`, `docs/DEPLOYMENT.md` | merged (`8f97523`) |
 | **PR #4** | own Keystore goal vault replacing `flutter_secure_storage`; storage failure only disables My Plan (v0.1.1) | merged (`1fcc1ca`) |
-| `claude/web-app` → **PR #5** | Flutter web build on Vercel `hatua-web`: branding, loading page with 1192, self-hosted assets, CSP, `/api` rewrite, no goals on web, CI job | see PR |
+| **PR #5**, **#6** | Flutter web build on Vercel `hatua-web` (self-hosted assets, CSP, `/api` rewrite, no goals on web) and its handoff | merged (`2e5de52`, `ff08e9a`) |
+| **PR #7** (Codex) | private application tracker on Android, encrypted with goals; v2 vault envelope with v1 migration | merged (`611f400`) after validation here: regenerated l10n, one outdated test fixed, 56/56 |
+| `claude/real-data-ux` → **PR #13** | v0.2.0: 109 real desk-checked listings via seed batches, anonymous report-a-problem + Admin queue, details page, county-first Support, welcome screen, Home 1192 band | see PR |
 
 ## Live deployment (2026-10-18)
 
@@ -56,12 +58,27 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | `build/web` behind a local HTTPS server that applies `vercel.json` headers and the `/api` rewrite (fixtures, then the live API), driven by Playwright Chromium | all tabs render; only same-origin requests; no CSP violations or page errors; My Plan shows the Android-only card; Settings shows the browser-storage privacy text; 2.67 MB brotli estimate |
 | `aapt2 dump` on that APK | package `com.example.hatua_app`, label `HATUA`, minSdk 24 (Android 7.0), targetSdk 36; permissions: `INTERNET` only (+ androidx's internal signature-level `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`); `allowBackup=false`, `fullBackupContent=false`, `dataExtractionRules` set; debug `networkSecurityConfig` present; https/tel queries present |
 
+## v0.2.0 checks (2026-10-18)
+
+| Check | Result |
+|---|---|
+| GitHub "failures" on PRs #3–#7 | every job refused with *"account is locked due to a billing issue"*; no code failure. Still blocked on the owner's billing |
+| `cd backend && python manage.py test` | **47/47 OK** (adds seed loader, shipped-data validity, reports: validation, CSRF-free, write-only, throttle 429, triage, purge) |
+| `ruff check .`, `makemigrations --check` | clean; one new migration `0003_seed_batches_reports_notes` |
+| `load_directory_seed` twice on a fresh SQLite DB | applied 10 opportunities + 99 resources, second run skipped; API returned all 99 (52 KB JSON) |
+| `cd mobile && flutter analyze` / `flutter test` | no issues / **68/68** (new `journeys_test.dart`: welcome, Home 1192 + county, details, report payload, support grouping and county filter, details sheet) |
+| `tool/screenshots/screenshots_test.dart` | 4/4 |
+| `bash tool/web_build.sh` then Playwright Chromium against the build + local seeded API | welcome → home → explore search → details → report sheet; support with Mombasa, details sheet (call, copy, directions); dark mode + Kiswahili; 1280px desktop column. No page errors |
+| `flutter build apk --release --target-platform android-arm64,android-arm` | built `app-release.apk` 35.6 MB, versionName 0.2.0 (code 3), permissions INTERNET only, `allowBackup=false`, API URL in `libapp.so`. Debug-signed |
+
+Data provenance: each listing's `source_url` is the page that was read on 18 Oct 2026 (NACADA's accredited-facility list for the 92 facilities; official programme pages, or a news article where no official page was reachable: Jitume, PSC portal, good-conduct how-to). Phone numbers were copied as listed; where NACADA listed several, only the first is shown. Nothing was phoned. Treat these as desk checks, not partner verification.
+
 ## Not verified
 
 - **Release APK on a real phone.** It builds and passes manifest checks, but nobody has installed it on a device yet.
 - No emulator or physical-device run, no TalkBack pass, no end-to-end test against a running Django server.
 - Kiswahili strings are a **draft** written by an AI assistant. They need native-speaker review, and the SAFETY COPY keys (`supportNacadaBody`, `supportEmergencyBody`) need review by a qualified professional before any pilot.
-- No real listings exist. Both directories are empty by design.
+- None of the 109 listings has been confirmed by phone or by the provider. Several NACADA entries share one phone number (they share premises); some programmes (NYOTA, PSC) open in windows, which the text says.
 
 ## What changed in this round (summary)
 
@@ -110,7 +127,7 @@ flutter test tool/screenshots/screenshots_test.dart --dart-define=SHOTS_DIR=$PWD
 
 ## Next exact actions
 
-0. Owner, now: change the admin password, delete `DJANGO_SUPERUSER_PASSWORD` in Vercel, deploy the Cloudflare Worker (`docs/DEPLOYMENT.md` steps 3–4).
+0. Owner: install `hatua-0.2.0.apk` and try Support → your county → call a centre; check Admin → Listing reports works from your phone. Then change the admin password, delete `DJANGO_SUPERUSER_PASSWORD` in Vercel, deploy the Cloudflare Worker (`docs/DEPLOYMENT.md` steps 3–4).
 1. Owner: clear the GitHub billing lock so CI (backend, flutter, edge) runs on GitHub.
 2. Owner: open https://hatua-web.vercel.app on a phone browser and report anything odd (it is the quickest way to see the app without installing the APK).
 3. Run the app on a real Android phone against a local backend (`adb reverse tcp:8000 tcp:8000`, `HATUA_API_URL=http://127.0.0.1:8000`). Do a TalkBack pass and record the observations here.

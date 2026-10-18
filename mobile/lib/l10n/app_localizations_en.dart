@@ -333,7 +333,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteFailed => 'Could not clear all data. Please retry.';
 
   @override
-  String get settingsVersion => 'HATUA v0.1.1 · Development preview';
+  String get settingsVersion => 'HATUA v0.2.0, pilot preview';
 
   @override
   String get settingsDisclaimer =>
@@ -418,4 +418,176 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get applicationStageClosed => 'Closed';
+
+  @override
+  String get homeTalkNowTitle => 'Talk to someone now';
+
+  @override
+  String get homeTalkNowBody =>
+      'Free NACADA helpline for alcohol and drug use, open 24 hours. Not an ambulance service.';
+
+  @override
+  String get homeCall1192 => 'Call 1192';
+
+  @override
+  String get homeCountyChoose => 'Choose your county';
+
+  @override
+  String homeCountySelected(String county) {
+    return 'Showing $county first';
+  }
+
+  @override
+  String get changeCounty => 'Change';
+
+  @override
+  String get detailsButton => 'Details';
+
+  @override
+  String get detailAbout => 'About';
+
+  @override
+  String get detailWhoCanApply => 'Who can apply';
+
+  @override
+  String get detailCost => 'Cost';
+
+  @override
+  String get detailHowToApply => 'How to apply';
+
+  @override
+  String get detailNoApplyLink =>
+      'There is no online form. Use the contacts in the description above.';
+
+  @override
+  String get deadlineNone => 'No closing date listed';
+
+  @override
+  String deadlineIn(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Closes in $days days',
+      one: 'Closes tomorrow',
+      zero: 'Closes today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get copyToShare => 'Copy to share';
+
+  @override
+  String get copiedToShare => 'Copied. Paste it into a message to share it.';
+
+  @override
+  String get reportProblem => 'Report a problem';
+
+  @override
+  String get reportTitle => 'What is wrong with this listing?';
+
+  @override
+  String get reportReasonBrokenLink => 'The link does not work';
+
+  @override
+  String get reportReasonWrongContact => 'The phone number or address is wrong';
+
+  @override
+  String get reportReasonClosed => 'It is closed, full or no longer offered';
+
+  @override
+  String get reportReasonScam => 'It looks like a scam or asks for money';
+
+  @override
+  String get reportReasonOther => 'Something else';
+
+  @override
+  String get reportNoteLabel => 'Details (optional)';
+
+  @override
+  String get reportNoteHint => 'Do not include your name or phone number.';
+
+  @override
+  String get reportPrivacy =>
+      'Reports are anonymous. HATUA does not record who sent them.';
+
+  @override
+  String get reportSend => 'Send report';
+
+  @override
+  String get reportSent => 'Report sent. HATUA staff will check this listing.';
+
+  @override
+  String get reportFailed =>
+      'Could not send the report. Check your connection and try again.';
+
+  @override
+  String get supportHelplinesTitle => 'Helplines you can call now';
+
+  @override
+  String get supportNearTitle => 'Treatment and support near you';
+
+  @override
+  String get supportNearChooseCounty =>
+      'Choose your county to see NACADA-accredited centres near you first.';
+
+  @override
+  String supportNoneInCounty(String county) {
+    return 'No listed centres in $county yet. Services in other counties are below.';
+  }
+
+  @override
+  String get supportOtherCounties => 'Other counties';
+
+  @override
+  String get supportMoreHelp => 'More help and information';
+
+  @override
+  String get supportCopyNumber => 'Copy number';
+
+  @override
+  String get numberCopied => 'Number copied';
+
+  @override
+  String get supportDirections => 'Directions';
+
+  @override
+  String get supportCallBefore =>
+      'Call before you travel to confirm opening hours, services and fees.';
+
+  @override
+  String resultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '1 result',
+      zero: 'No results',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get welcomeLanguage => 'Choose your language';
+
+  @override
+  String get welcomePrivacyTitle => 'Private by design';
+
+  @override
+  String get welcomeNoAccount =>
+      'No account and no tracking. Use everything as a guest.';
+
+  @override
+  String get welcomeOnDevice =>
+      'Your county and saved listings stay on this device.';
+
+  @override
+  String get welcomeSupportPrivate =>
+      'Support services you look at are never saved.';
+
+  @override
+  String get welcomeCounty => 'Your county (optional)';
+
+  @override
+  String get welcomeStart => 'Start';
 }

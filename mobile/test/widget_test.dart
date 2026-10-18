@@ -62,8 +62,19 @@ void main() {
       expect(find.text('Kisumu training'), findsOneWidget);
       expect(find.text('National grant'), findsOneWidget);
       expect(find.text('Closed job'), findsNothing, reason: 'deadline passed before testNow');
-      expect(find.textContaining('Employment · Nairobi · Closes 30 Nov 2026'), findsOneWidget);
-      expect(find.text('Last checked by HATUA on 1 Oct 2026'), findsNWidgets(3));
+      expect(find.text('Employment'), findsWidgets);
+      expect(find.text('Closes 30 Nov 2026'), findsOneWidget);
+      expect(find.text('Nationwide'), findsWidgets);
+    });
+
+    testWidgets('lists nationwide first, then by deadline; your county first once chosen', (tester) async {
+      await pumpExplore(tester);
+      double y(String text) => tester.getTopLeft(find.text(text)).dy;
+      expect(y('National grant'), lessThan(y('Nairobi job')));
+      expect(y('Nairobi job'), lessThan(y('Kisumu training')), reason: 'a closing date sorts before none');
+      await store.setCounty('Nairobi');
+      await tester.pumpAndSettle();
+      expect(y('Nairobi job'), lessThan(y('National grant')));
     });
 
     testWidgets('category chips filter the list', (tester) async {
@@ -97,7 +108,8 @@ void main() {
 
     testWidgets('saved-only shows bookmarked listings', (tester) async {
       await pumpExplore(tester);
-      await tapVisible(tester, find.byTooltip('Save opportunity').first);
+      final nairobiCard = find.ancestor(of: find.text('Nairobi job'), matching: find.byType(Card));
+      await tapVisible(tester, find.descendant(of: nairobiCard, matching: find.byTooltip('Save opportunity')));
       expect(store.isSaved('o1'), isTrue);
       await tapVisible(tester, find.text('Saved only'));
       expect(find.text('Nairobi job'), findsOneWidget);
@@ -186,6 +198,7 @@ void main() {
       useTallPhone(tester);
       await store.addGoal('Private');
       vault.failWith = 'KeyStoreException: simulated';
+      await store.completeOnboarding();
       final broken = LocalStore(vault: vault);
       await tester.pumpWidget(HatuaApp(store: broken, repository: fakeRepository()));
       await tester.pumpAndSettle();
@@ -272,6 +285,8 @@ void main() {
   });
 
   group('Whole app', () {
+    setUp(() => store.completeOnboarding());
+
     testWidgets('does not download directories until their tab is opened', (tester) async {
       final requests = <String>[];
       await tester.pumpWidget(HatuaApp(store: store, repository: fakeRepository(requests: requests)));

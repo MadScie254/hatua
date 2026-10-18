@@ -79,7 +79,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
-    'DEFAULT_THROTTLE_RATES': {'anon': '60/min', 'user': '600/hour'},
+    'DEFAULT_THROTTLE_RATES': {'anon': '60/min', 'user': '600/hour', 'reports': '10/hour'},
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
 }
 # A verification older than this silently removes the record from the public API until staff

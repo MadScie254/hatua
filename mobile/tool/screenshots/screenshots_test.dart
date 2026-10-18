@@ -51,7 +51,10 @@ void main() {
   setUpAll(_loadFonts);
 
   Future<LocalStore> freshStore({String? language, List<String> goals = const []}) async {
-    SharedPreferences.setMockInitialValues({if (language != null) LocalStore.localeKey: language});
+    SharedPreferences.setMockInitialValues({
+      LocalStore.onboardedKey: true,
+      if (language != null) LocalStore.localeKey: language,
+    });
     final store = LocalStore(vault: FakeGoalVault());
     await store.load();
     for (final goal in goals) {

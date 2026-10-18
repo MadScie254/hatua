@@ -2,7 +2,8 @@
 
 Vercel installs requirements.txt and runs `collectstatic` itself. This script adds:
   1. `check --deploy` failing on errors (warnings are printed, not fatal);
-  2. production only: database migrations and the first staff superuser.
+  2. production only: database migrations, the first staff superuser, curated directory
+     batches from directory/seed/ (each applied once) and purging old handled reports.
 
 Preview builds never migrate, so a preview branch cannot change the production schema.
 Migrations use Neon's direct connection (DATABASE_URL_UNPOOLED) when it exists, because
@@ -31,6 +32,8 @@ def main() -> None:
     print('build.py: migrate', flush=True)
     call_command('migrate', interactive=False)
     call_command('ensure_superuser')
+    call_command('load_directory_seed')
+    call_command('purge_reports')
 
 
 if __name__ == '__main__':

@@ -9,7 +9,9 @@ import 'screens/home_screen.dart';
 import 'screens/plan_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/support_screen.dart';
+import 'screens/welcome_screen.dart';
 import 'theme/app_theme.dart';
+import 'widgets/directory_widgets.dart';
 
 class HatuaApp extends StatefulWidget {
   /// [store] and [repository] are injectable for tests; production builds create their own.
@@ -35,8 +37,16 @@ class _HatuaAppState extends State<HatuaApp> {
     _load();
   }
 
+  bool _onboarded = false;
+
   void _onStoreChanged() {
-    if (_store.locale != _locale && mounted) setState(() => _locale = _store.locale);
+    if (!mounted) return;
+    if (_store.locale != _locale || _store.onboarded != _onboarded) {
+      setState(() {
+        _locale = _store.locale;
+        _onboarded = _store.onboarded;
+      });
+    }
   }
 
   @override
@@ -54,6 +64,7 @@ class _HatuaAppState extends State<HatuaApp> {
       setState(() {
         _ready = true;
         _failed = false;
+        _onboarded = _store.onboarded;
       });
     } catch (_) {
       if (!mounted) return;
@@ -89,7 +100,9 @@ class _HatuaAppState extends State<HatuaApp> {
             ? _StorageErrorScreen(onRetry: _load, onReset: _resetAndLoad)
             : !_ready
                 ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-                : AppShell(store: _store, repository: _repository),
+                : _onboarded
+                    ? AppShell(store: _store, repository: _repository)
+                    : WelcomeScreen(store: _store),
       );
 }
 
@@ -146,18 +159,19 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final pages = <Widget Function()>[
-      () => HomeScreen(onNavigate: _select),
+      () => HomeScreen(onNavigate: _select, store: widget.store),
       () => ExploreScreen(store: widget.store, repository: widget.repository),
       () => SupportScreen(store: widget.store, repository: widget.repository),
       () => PlanScreen(store: widget.store),
       () => SettingsScreen(store: widget.store),
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold))),
+      appBar: AppBar(title: Text(l10n.appTitle)),
       body: IndexedStack(
         index: _selected,
         children: [
-          for (var i = 0; i < pages.length; i++) _visited.contains(i) ? pages[i]() : const SizedBox.shrink(),
+          for (var i = 0; i < pages.length; i++)
+            _visited.contains(i) ? CenteredContent(child: pages[i]()) : const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -1,14 +1,19 @@
 from django.db.models import Q
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.views import APIView
 
 from .models import Opportunity, SupportResource
-from .serializers import OpportunitySerializer, SupportResourceSerializer
+from .serializers import ListingReportSerializer, OpportunitySerializer, SupportResourceSerializer
 
-MAX_RESULTS = 100
+# The app downloads each directory in one request and filters on the device (offline use, and
+# the user's county never leaves the phone). Raise with care; add paging before ~500.
+MAX_RESULTS = 250
 
 
 @api_view(['GET'])
@@ -24,7 +29,9 @@ def index(request):
     return Response({
         'service': 'hatua-api',
         'description': 'Public, read-only directory of verified opportunities and support resources (Kenya).',
-        'endpoints': ['/api/v1/health/', '/api/v1/opportunities/', '/api/v1/support-resources/'],
+        'endpoints': [
+            '/api/v1/health/', '/api/v1/opportunities/', '/api/v1/support-resources/', '/api/v1/reports/ (POST)',
+        ],
     })
 
 
@@ -78,3 +85,22 @@ class SupportResourceList(PublicDirectoryList):
 
     def base_queryset(self):
         return SupportResource.objects.published()
+
+
+class ListingReportCreate(APIView):
+    """POST-only, anonymous "report a problem" for a published listing.
+
+    No authentication (so no session or CSRF), no IP or device stored; throttled per client
+    by the `reports` scope. Responds with a fixed body so it cannot be used to probe records.
+    """
+
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = 'reports'
+
+    def post(self, request):
+        serializer = ListingReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'status': 'received'}, status=status.HTTP_201_CREATED)

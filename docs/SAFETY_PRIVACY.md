@@ -44,6 +44,10 @@ Server-side data (pilot deployment, 2026-10-18): public directory entries and st
 
 Android backup: `allowBackup="false"`, `fullBackupContent="false"` and `data_extraction_rules.xml` exclude all app data from Google cloud backup and device-to-device transfer, so goals never leave the phone through backups (verified in the manifest, not yet on a device). The only Android permission requested is `INTERNET`; opening the dialer for 1192 or a provider needs no phone permission and places no call automatically.
 
+**Listing reports (v0.2).** "Report a problem" sends only the listing id, a reason code and an optional note of up to 300 characters to the API. No account, IP address, device identifier or contact detail is stored with it; the note field tells people not to include their name or phone number. Reports are visible only to staff in Admin, and handled reports are deleted after 90 days. Reporting a support resource reveals to staff only that someone looked at that resource, not who. Behind the web app's `/api` rewrite and the Cloudflare edge, many users can share one client address for the 10/hour report throttle.
+
+**Welcome screen (v0.2).** Shown once; language and county are optional and stay on the device. The "welcome done" flag is not personal and survives "Delete my local data" so the user is not thrown back to the welcome screen.
+
 Support-seeking leaves minimal trace on the device by design: support resources cannot be bookmarked, and the Support tab stores nothing. A shared or inspected phone still shows the app itself and its recent screen in the app switcher; consider `FLAG_SECURE` or a neutral app-switcher preview after user research.
 
 ## Work blocked until review

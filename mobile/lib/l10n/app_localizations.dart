@@ -677,7 +677,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsVersion.
   ///
   /// In en, this message translates to:
-  /// **'HATUA v0.1.1 · Development preview'**
+  /// **'HATUA v0.2.0, pilot preview'**
   String get settingsVersion;
 
   /// No description provided for @settingsDisclaimer.
@@ -829,6 +829,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Closed'**
   String get applicationStageClosed;
+
+  /// No description provided for @homeTalkNowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to someone now'**
+  String get homeTalkNowTitle;
+
+  /// No description provided for @homeTalkNowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Free NACADA helpline for alcohol and drug use, open 24 hours. Not an ambulance service.'**
+  String get homeTalkNowBody;
+
+  /// No description provided for @homeCall1192.
+  ///
+  /// In en, this message translates to:
+  /// **'Call 1192'**
+  String get homeCall1192;
+
+  /// No description provided for @homeCountyChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your county'**
+  String get homeCountyChoose;
+
+  /// No description provided for @homeCountySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {county} first'**
+  String homeCountySelected(String county);
+
+  /// No description provided for @changeCounty.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changeCounty;
+
+  /// No description provided for @detailsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get detailsButton;
+
+  /// No description provided for @detailAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get detailAbout;
+
+  /// No description provided for @detailWhoCanApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Who can apply'**
+  String get detailWhoCanApply;
+
+  /// No description provided for @detailCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get detailCost;
+
+  /// No description provided for @detailHowToApply.
+  ///
+  /// In en, this message translates to:
+  /// **'How to apply'**
+  String get detailHowToApply;
+
+  /// No description provided for @detailNoApplyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no online form. Use the contacts in the description above.'**
+  String get detailNoApplyLink;
+
+  /// No description provided for @deadlineNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No closing date listed'**
+  String get deadlineNone;
+
+  /// No description provided for @deadlineIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Closes today} =1{Closes tomorrow} other{Closes in {days} days}}'**
+  String deadlineIn(int days);
+
+  /// No description provided for @copyToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to share'**
+  String get copyToShare;
+
+  /// No description provided for @copiedToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied. Paste it into a message to share it.'**
+  String get copiedToShare;
+
+  /// No description provided for @reportProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get reportProblem;
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is wrong with this listing?'**
+  String get reportTitle;
+
+  /// No description provided for @reportReasonBrokenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'The link does not work'**
+  String get reportReasonBrokenLink;
+
+  /// No description provided for @reportReasonWrongContact.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone number or address is wrong'**
+  String get reportReasonWrongContact;
+
+  /// No description provided for @reportReasonClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'It is closed, full or no longer offered'**
+  String get reportReasonClosed;
+
+  /// No description provided for @reportReasonScam.
+  ///
+  /// In en, this message translates to:
+  /// **'It looks like a scam or asks for money'**
+  String get reportReasonScam;
+
+  /// No description provided for @reportReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get reportReasonOther;
+
+  /// No description provided for @reportNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details (optional)'**
+  String get reportNoteLabel;
+
+  /// No description provided for @reportNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not include your name or phone number.'**
+  String get reportNoteHint;
+
+  /// No description provided for @reportPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports are anonymous. HATUA does not record who sent them.'**
+  String get reportPrivacy;
+
+  /// No description provided for @reportSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send report'**
+  String get reportSend;
+
+  /// No description provided for @reportSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Report sent. HATUA staff will check this listing.'**
+  String get reportSent;
+
+  /// No description provided for @reportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the report. Check your connection and try again.'**
+  String get reportFailed;
+
+  /// No description provided for @supportHelplinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Helplines you can call now'**
+  String get supportHelplinesTitle;
+
+  /// No description provided for @supportNearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment and support near you'**
+  String get supportNearTitle;
+
+  /// No description provided for @supportNearChooseCounty.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your county to see NACADA-accredited centres near you first.'**
+  String get supportNearChooseCounty;
+
+  /// No description provided for @supportNoneInCounty.
+  ///
+  /// In en, this message translates to:
+  /// **'No listed centres in {county} yet. Services in other counties are below.'**
+  String supportNoneInCounty(String county);
+
+  /// No description provided for @supportOtherCounties.
+  ///
+  /// In en, this message translates to:
+  /// **'Other counties'**
+  String get supportOtherCounties;
+
+  /// No description provided for @supportMoreHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'More help and information'**
+  String get supportMoreHelp;
+
+  /// No description provided for @supportCopyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy number'**
+  String get supportCopyNumber;
+
+  /// No description provided for @numberCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Number copied'**
+  String get numberCopied;
+
+  /// No description provided for @supportDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get supportDirections;
+
+  /// No description provided for @supportCallBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Call before you travel to confirm opening hours, services and fees.'**
+  String get supportCallBefore;
+
+  /// No description provided for @resultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No results} =1{1 result} other{{count} results}}'**
+  String resultsCount(int count);
+
+  /// No description provided for @welcomeLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get welcomeLanguage;
+
+  /// No description provided for @welcomePrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private by design'**
+  String get welcomePrivacyTitle;
+
+  /// No description provided for @welcomeNoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'No account and no tracking. Use everything as a guest.'**
+  String get welcomeNoAccount;
+
+  /// No description provided for @welcomeOnDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your county and saved listings stay on this device.'**
+  String get welcomeOnDevice;
+
+  /// No description provided for @welcomeSupportPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Support services you look at are never saved.'**
+  String get welcomeSupportPrivate;
+
+  /// No description provided for @welcomeCounty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your county (optional)'**
+  String get welcomeCounty;
+
+  /// No description provided for @welcomeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get welcomeStart;
 }
 
 class _AppLocalizationsDelegate
