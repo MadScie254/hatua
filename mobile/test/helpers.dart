@@ -46,16 +46,22 @@ final sampleResources = [
   resourceJson('s2', 'Kisumu facility', kind: 'facility', county: 'Kisumu'),
 ];
 
-/// Repository backed by an in-memory API. Records every requested path in [requests].
+/// Repository backed by an in-memory API. Records every requested path in [requests] and the
+/// JSON body of every report POST in [reports].
 CatalogRepository fakeRepository({
   List<Map<String, Object?>>? opportunities,
   List<Map<String, Object?>>? resources,
   bool fail = false,
   List<String>? requests,
+  List<Map<String, dynamic>>? reports,
 }) {
   final client = MockClient((request) async {
     requests?.add(request.url.path);
     if (fail) return http.Response('down', 503);
+    if (request.method == 'POST' && request.url.path == '/api/v1/reports/') {
+      reports?.add(jsonDecode(request.body) as Map<String, dynamic>);
+      return http.Response('{"status":"received"}', 201, headers: {'content-type': 'application/json'});
+    }
     final body = request.url.path.contains('opportunities')
         ? (opportunities ?? sampleOpportunities)
         : (resources ?? sampleResources);

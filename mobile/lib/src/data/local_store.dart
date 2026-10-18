@@ -32,6 +32,7 @@ class LocalStore extends ChangeNotifier {
   static const savedKey = 'hatua.saved.opportunities.v1';
   static const countyKey = 'hatua.prefs.county.v1';
   static const localeKey = 'hatua.prefs.locale.v1';
+  static const onboardedKey = 'hatua.prefs.onboarded.v1';
   static const supportedLanguageCodes = <String>['en', 'sw'];
   static const maxGoalLength = 160;
 
@@ -44,6 +45,7 @@ class LocalStore extends ChangeNotifier {
   Set<String> _savedIds = {};
   String? _county;
   String? _languageCode;
+  bool _onboarded = false;
 
   List<Goal> get goals => List.unmodifiable(_goals);
   List<ApplicationRecord> get applications => List.unmodifiable(_applications);
@@ -58,6 +60,9 @@ class LocalStore extends ChangeNotifier {
   /// Chosen county, or null for all counties.
   String? get county => _county;
 
+  /// True once the welcome screen (language, privacy, county) has been completed or skipped.
+  bool get onboarded => _onboarded;
+
   /// Explicit app language, or null to follow the phone's language.
   String? get languageCode => _languageCode;
   Locale? get locale => _languageCode == null ? null : Locale(_languageCode!);
@@ -71,6 +76,7 @@ class LocalStore extends ChangeNotifier {
     _county = kenyanCounties.contains(county) ? county : null;
     final language = prefs.getString(localeKey);
     _languageCode = supportedLanguageCodes.contains(language) ? language : null;
+    _onboarded = prefs.getBool(onboardedKey) ?? false;
     await _loadGoals(prefs);
     notifyListeners();
   }
@@ -166,6 +172,14 @@ class LocalStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> completeOnboarding() async {
+    if (_onboarded) return;
+    _onboarded = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(onboardedKey, true);
+    notifyListeners();
+  }
+
   Future<void> setLanguageCode(String? code) async {
     final value = supportedLanguageCodes.contains(code) ? code : null;
     if (value == _languageCode) return;
@@ -221,9 +235,12 @@ class LocalStore extends ChangeNotifier {
 
   Future<void> removeGoal(String id) => _commitPrivate(goals: _goals.where((g) => g.id != id).toList());
 
-  /// Removes every HATUA value from this device: goals and their key, bookmarks, preferences, caches.
+  /// Removes every personal HATUA value from this device: goals and their key, bookmarks,
+  /// preferences and cached directories.
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
+    // The welcome-done flag is kept: it says nothing about the user, and wiping it would throw
+    // them back to the welcome screen mid-session.
     for (final key in [goalsKey, savedKey, countyKey, localeKey, ...CatalogRepository.allCacheKeys]) {
       await prefs.remove(key);
     }

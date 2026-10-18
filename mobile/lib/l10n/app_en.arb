@@ -175,7 +175,7 @@
   "settingsDeleteConfirmBody": "This permanently removes goals, tracked applications, saved listings, preferences and cached public data.",
   "settingsDeleted": "Local app data cleared.",
   "settingsDeleteFailed": "Could not clear all data. Please retry.",
-  "settingsVersion": "HATUA v0.1.1 · Development preview",
+  "settingsVersion": "HATUA v0.2.0, pilot preview",
   "settingsDisclaimer": "HATUA is an information and referral tool, not a healthcare provider or a guarantee of employment.",
   "planUnavailableTitle": "Private goals are unavailable on this phone",
   "planUnavailableBody": "This phone's secure storage could not be used, so HATUA will not save goals rather than keep them unprotected. Everything else in the app still works.",
@@ -206,5 +206,80 @@
   "applicationStageApplied": "Applied",
   "applicationStageInterview": "Interview",
   "applicationStageOffered": "Offer received",
-  "applicationStageClosed": "Closed"
+  "applicationStageClosed": "Closed",
+  "homeTalkNowTitle": "Talk to someone now",
+  "homeTalkNowBody": "Free NACADA helpline for alcohol and drug use, open 24 hours. Not an ambulance service.",
+  "homeCall1192": "Call 1192",
+  "homeCountyChoose": "Choose your county",
+  "homeCountySelected": "Showing {county} first",
+  "@homeCountySelected": {
+    "placeholders": {
+      "county": {
+        "type": "String"
+      }
+    }
+  },
+  "changeCounty": "Change",
+  "detailsButton": "Details",
+  "detailAbout": "About",
+  "detailWhoCanApply": "Who can apply",
+  "detailCost": "Cost",
+  "detailHowToApply": "How to apply",
+  "detailNoApplyLink": "There is no online form. Use the contacts in the description above.",
+  "deadlineNone": "No closing date listed",
+  "deadlineIn": "{days, plural, =0{Closes today} =1{Closes tomorrow} other{Closes in {days} days}}",
+  "@deadlineIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "copyToShare": "Copy to share",
+  "copiedToShare": "Copied. Paste it into a message to share it.",
+  "reportProblem": "Report a problem",
+  "reportTitle": "What is wrong with this listing?",
+  "reportReasonBrokenLink": "The link does not work",
+  "reportReasonWrongContact": "The phone number or address is wrong",
+  "reportReasonClosed": "It is closed, full or no longer offered",
+  "reportReasonScam": "It looks like a scam or asks for money",
+  "reportReasonOther": "Something else",
+  "reportNoteLabel": "Details (optional)",
+  "reportNoteHint": "Do not include your name or phone number.",
+  "reportPrivacy": "Reports are anonymous. HATUA does not record who sent them.",
+  "reportSend": "Send report",
+  "reportSent": "Report sent. HATUA staff will check this listing.",
+  "reportFailed": "Could not send the report. Check your connection and try again.",
+  "supportHelplinesTitle": "Helplines you can call now",
+  "supportNearTitle": "Treatment and support near you",
+  "supportNearChooseCounty": "Choose your county to see NACADA-accredited centres near you first.",
+  "supportNoneInCounty": "No listed centres in {county} yet. Services in other counties are below.",
+  "@supportNoneInCounty": {
+    "placeholders": {
+      "county": {
+        "type": "String"
+      }
+    }
+  },
+  "supportOtherCounties": "Other counties",
+  "supportMoreHelp": "More help and information",
+  "supportCopyNumber": "Copy number",
+  "numberCopied": "Number copied",
+  "supportDirections": "Directions",
+  "supportCallBefore": "Call before you travel to confirm opening hours, services and fees.",
+  "resultsCount": "{count, plural, =0{No results} =1{1 result} other{{count} results}}",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomeLanguage": "Choose your language",
+  "welcomePrivacyTitle": "Private by design",
+  "welcomeNoAccount": "No account and no tracking. Use everything as a guest.",
+  "welcomeOnDevice": "Your county and saved listings stay on this device.",
+  "welcomeSupportPrivate": "Support services you look at are never saved.",
+  "welcomeCounty": "Your county (optional)",
+  "welcomeStart": "Start"
 }
