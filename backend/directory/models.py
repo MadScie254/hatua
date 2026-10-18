@@ -60,6 +60,11 @@ class PublishedRecord(models.Model):
         on_delete=models.SET_NULL, related_name='+',
         help_text='Staff account that last verified this record. Internal only; never exposed by the API.',
     )
+    verification_note = models.CharField(
+        max_length=240, blank=True,
+        help_text='Internal: how the source was checked, e.g. "phoned the centre" or a desk check. '
+                  'Cleared when staff re-verify unless you edit it. Never exposed by the API.',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -154,3 +159,68 @@ class SupportResource(PublishedRecord):
 
     def __str__(self):
         return self.name
+
+
+class SeedBatch(models.Model):
+    """A curated batch from directory/seed/ that `load_directory_seed` has applied.
+
+    Each batch is applied at most once per database, so records staff later edit, revoke or
+    delete are never recreated by a later deploy.
+    """
+
+    name = models.CharField(max_length=120, unique=True)
+    applied_at = models.DateTimeField(auto_now_add=True)
+    opportunities_created = models.PositiveIntegerField(default=0)
+    resources_created = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ('-applied_at',)
+
+    def __str__(self):
+        return self.name
+
+
+class ListingReport(models.Model):
+    """A user's report that a PUBLIC listing is wrong, broken or suspicious.
+
+    Deliberately minimal: no account, IP address, device or contact details are stored. The
+    optional note is shown only to staff and purged with the report (see purge_reports).
+    """
+
+    class RecordType(models.TextChoices):
+        OPPORTUNITY = 'opportunity', 'Opportunity'
+        SUPPORT_RESOURCE = 'support_resource', 'Support resource'
+
+    class Reason(models.TextChoices):
+        BROKEN_LINK = 'broken_link', 'Link does not work'
+        WRONG_CONTACT = 'wrong_contact', 'Phone number or address is wrong'
+        CLOSED = 'closed', 'Closed, full or no longer offered'
+        SUSPECTED_SCAM = 'suspected_scam', 'Looks like a scam or asks for money'
+        OTHER = 'other', 'Something else is wrong'
+
+    class Status(models.TextChoices):
+        NEW = 'new', 'New'
+        ACTIONED = 'actioned', 'Fixed or revoked'
+        DISMISSED = 'dismissed', 'Checked, no change needed'
+
+    MAX_NOTE = 300
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    record_type = models.CharField(max_length=20, choices=RecordType.choices)
+    record_id = models.UUIDField(db_index=True)
+    record_label = models.CharField(max_length=180, help_text='Title or name when the report was made.')
+    reason = models.CharField(max_length=20, choices=Reason.choices)
+    note = models.CharField(max_length=MAX_NOTE, blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.NEW, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, editable=False,
+        on_delete=models.SET_NULL, related_name='+',
+    )
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'{self.get_reason_display()}: {self.record_label}'

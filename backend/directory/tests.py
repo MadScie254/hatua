@@ -60,7 +60,7 @@ class PublicDirectoryTests(TestCase):
 
     def test_public_payload_hides_moderation_fields(self):
         item = self.client.get('/api/v1/opportunities/?county=Nairobi').json()[0]
-        for private in ('is_verified', 'is_active', 'verified_by', 'created_at', 'updated_at'):
+        for private in ('is_verified', 'is_active', 'verified_by', 'verification_note', 'created_at', 'updated_at'):
             self.assertNotIn(private, item)
         self.assertEqual(item['source_url'], SOURCE)
         self.assertIsNotNone(item['last_verified_at'])
