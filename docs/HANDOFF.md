@@ -14,7 +14,7 @@
 | **PR #4** | own Keystore goal vault replacing `flutter_secure_storage`; storage failure only disables My Plan (v0.1.1) | merged (`1fcc1ca`) |
 | **PR #5**, **#6** | Flutter web build on Vercel `hatua-web` (self-hosted assets, CSP, `/api` rewrite, no goals on web) and its handoff | merged (`2e5de52`, `ff08e9a`) |
 | **PR #7** (Codex) | private application tracker on Android, encrypted with goals; v2 vault envelope with v1 migration | merged (`611f400`) after validation here: regenerated l10n, one outdated test fixed, 56/56 |
-| `claude/real-data-ux` → **PR #13** | v0.2.0: 109 real desk-checked listings via seed batches, anonymous report-a-problem + Admin queue, details page, county-first Support, welcome screen, Home 1192 band | see PR |
+| **PR #13** | v0.2.0: 109 real desk-checked listings via seed batches, anonymous report-a-problem + Admin queue, details page, county-first Support, welcome screen, Home 1192 band | merged (`88b1e19`) |
 
 ## Live deployment (2026-10-18)
 
@@ -70,6 +70,8 @@ Environment: Linux x86_64, Python 3.13.16, Django 5.2.18, DRF 3.16.1, ruff 0.17.
 | `tool/screenshots/screenshots_test.dart` | 4/4 |
 | `bash tool/web_build.sh` then Playwright Chromium against the build + local seeded API | welcome → home → explore search → details → report sheet; support with Mombasa, details sheet (call, copy, directions); dark mode + Kiswahili; 1280px desktop column. No page errors |
 | `flutter build apk --release --target-platform android-arm64,android-arm` | built `app-release.apk` 35.6 MB, versionName 0.2.0 (code 3), permissions INTERNET only, `allowBackup=false`, API URL in `libapp.so`. Debug-signed |
+
+Production after merging PR #13 (`88b1e19`): API preview build for the branch passed `check --deploy`; production `build.py` migrated and loaded the batch. From outside: `/api/v1/support-resources/` returns 99 records, `/api/v1/opportunities/` 10; `?county=Mombasa` returns 12 (7 Mombasa + 5 nationwide); no private fields (`verification_note`, `is_verified`, `verified_by`) in payloads; `POST /api/v1/reports/` with an unknown id → 400 `{"record_id": ["No published listing with this id."]}` and `GET` → 405 (no test report was written to production). hatua-web production `dpl_GDhXk2YevwmtDbsovmvVdbfwqgvX` built from the merge; Chromium on production: welcome → Home → Explore search → details → report sheet; Support with Mombasa → Kisauni MAT Clinic sheet (call, copy, directions); only `hatua-web.vercel.app` contacted, 3.17 MB first load, no page errors. Spot check of 8 facility phone numbers against a fresh read of NACADA's list: 8/8 match.
 
 Data provenance: each listing's `source_url` is the page that was read on 18 Oct 2026 (NACADA's accredited-facility list for the 92 facilities; official programme pages, or a news article where no official page was reachable: Jitume, PSC portal, good-conduct how-to). Phone numbers were copied as listed; where NACADA listed several, only the first is shown. Nothing was phoned. Treat these as desk checks, not partner verification.
 

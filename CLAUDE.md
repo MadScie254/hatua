@@ -75,7 +75,7 @@ See `docs/DECISIONS.md`. Especially: Android first, guest-first, public verified
 ## Pending features and GitHub delivery queue (2026-10-18)
 
 - **PR #7** (application tracker): merged 2026-10-18 at the owner's request after Flutter validation (gen-l10n, analyze, tests). Still needs a device smoke test of the legacy goal migration. Goals and application records share one vault key, so "reset" deletes both.
-- **Issue #8:** partly done in v0.2 (PR #8 branch `claude/real-data-ux`): first real listings (desk-checked), details view, welcome screen, anonymous report flow with moderation queue. Still open: real-device/TalkBack test, pilot-county partner verification, privacy notice and complaint contact, native-speaker Kiswahili.
+- **Issue #8:** partly done in v0.2 (PR #13, merged): first real listings (desk-checked), details view, welcome screen, anonymous report flow with moderation queue. Still open: real-device/TalkBack test, pilot-county partner verification, privacy notice and complaint contact, native-speaker Kiswahili.
 - **Issue #9:** goal subtasks, reminders, CV builder, skills/financial modules.
 - **Issue #10:** addiction support and consented referrals, blocked on clinical/privacy review.
 - **Issue #11:** NGO partner dashboard and billing, blocked on partner agreements/security reviews.
