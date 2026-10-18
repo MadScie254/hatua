@@ -745,6 +745,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
   String get settingsPrivacyBodyNoGoals;
+
   /// No description provided for @exploreTrack.
   ///
   /// In en, this message translates to:

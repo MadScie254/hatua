@@ -27,6 +27,7 @@ enum GoalsStatus { ready, unavailable, unsupported }
 class LocalStore extends ChangeNotifier {
   LocalStore({GoalVault? vault}) : _vault = vault ?? const PlatformGoalVault();
 
+  // Keep the v1 preference key so existing encrypted goals survive the v2 envelope upgrade.
   static const goalsKey = 'hatua.goals.enc.v1';
   static const savedKey = 'hatua.saved.opportunities.v1';
   static const countyKey = 'hatua.prefs.county.v1';
