@@ -1,8 +1,8 @@
 # HATUA | One step forward, every day
 
-**Status: v0.1.0 pilot foundation. NOT a finished, released, or clinically validated app.**
+**Status: v0.2.0 pilot. NOT a finished, released, or clinically validated app.**
 
-**Live API (staging/pilot):** https://hatua-api.vercel.app/api/v1/health/ (Vercel + Neon Postgres; directory intentionally empty until staff verify entries). **Web app (same Flutter code):** https://hatua-web.vercel.app (My Plan is Android-only). Deployment and operations: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+**Live API (staging/pilot):** https://hatua-api.vercel.app/api/v1/health/ (Vercel + Neon Postgres; 10 opportunities and 99 support services, real and sourced, desk-checked 18 Oct 2026). **Web app (same Flutter code):** https://hatua-web.vercel.app (My Plan is Android-only). Deployment and operations: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 Kenya-first Android project connecting people to **verified economic opportunities** and **reliable addiction support resources**, plus private, on-device goals. Job discovery and recovery support remain separate and optional. The public app is free; future partner subscriptions can fund operations without charging for essential assistance.
 
@@ -15,12 +15,15 @@ Kenya-first Android project connecting people to **verified economic opportuniti
 - Django Admin for staff (internal only): provenance required before verification, reviewer recorded, "Revoke now".
 - Offline fallback for **public** listings (24 h, then deleted); encrypted local goal storage.
 - The same app as a web build on Vercel (`hatua-web`): self-hosted assets, strict CSP, `/api` proxied to the API, no goals stored in browsers.
-- Tests (35 backend, 48 Flutter, 11 edge Worker, all passing locally), CI workflows, product/privacy/architecture docs.
+- Real listings: NACADA-accredited treatment centres in 31 counties, helplines (Befrienders, Childline 116, one2one 1190), AA Kenya, SAPTA, and training/work programmes (Generation Kenya, ALX, NYOTA, Jitume, KNQA RPL, PSC portal). Each links to the official source it was checked against.
+- Anonymous "report a problem" on every listing, with a staff moderation queue.
+- Private application tracker on Android (Interested → Applied → Interview → Offer → Closed), encrypted with the goals.
+- Tests (47 backend, 68 Flutter, 11 edge Worker, all passing locally), CI workflows, product/privacy/architecture docs.
 - Claude handoff: [`CLAUDE.md`](CLAUDE.md), [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
 ### What's deliberately NOT built
 
-Real provider catalogue, user accounts, applications, referrals, partner billing, **reviewed** Kiswahili, live notification system, AI matching, clinical tools, iOS app, production infrastructure, a release-signed APK. Do not advertise these as implemented.
+A partner- or phone-verified provider catalogue (current listings are desk-checked against official pages), user accounts, applications, referrals, partner billing, **reviewed** Kiswahili, live notification system, AI matching, clinical tools, iOS app, production infrastructure, a release-signed APK. Do not advertise these as implemented.
 
 ## Repository layout
 

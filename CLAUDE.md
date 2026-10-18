@@ -24,6 +24,7 @@ You are continuing **HATUA**, a Kenya-first Android product for verified economi
 - Mobile `CatalogRepository`: read-only API, 24h public offline copy, https-only in release, reports network/cache/unavailable.
 - Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals AND local application statuses encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
 - Web: `mobile/web/` (branding, loading page with 1192, `flutter_bootstrap.js`), `mobile/vercel.json` (CSP, `/api` rewrite), `mobile/tool/web_*.sh`. On the web `CatalogRepository` calls its own origin and `GoalVault.isSupported` is false (My Plan off). Keep the build free of third-party requests (`--no-web-resources-cdn`, `tool/check_web_build.sh`).
+- Directory data: curated batches in `backend/directory/seed/*.json`, applied once per database by `load_directory_seed` (runs on production deploys). Never put invented listings there; every record needs the official `source_url` that was checked. Reports: `POST /api/v1/reports/` → `ListingReport` (Admin queue), purged 90 days after handling.
 - Mobile strings: `mobile/lib/l10n/app_en.arb` (template) and `app_sw.arb` (**draft** Kiswahili). Never hard-code UI text; run `flutter gen-l10n` and commit the generated files.
 
 ## Deployment
@@ -35,6 +36,7 @@ Live pilot API: https://hatua-api.vercel.app (Vercel project `hatua-api`, root `
 - `GET /api/v1/health/`
 - `GET /api/v1/opportunities/?county=&category=&q=`
 - `GET /api/v1/support-resources/?county=&kind=&q=`
+- `POST /api/v1/reports/` (anonymous report about a published listing)
 
 Unknown `category`/`kind` returns 400. See `docs/API_CONTRACT.md`.
 
@@ -44,13 +46,13 @@ Backend: create a Python venv, install `backend/requirements-dev.txt`, export `D
 
 ## Validation status (updated 2026-10-18)
 
-Locally verified: backend migrations/check/35 tests/ruff, Flutter analyze/48 tests, web release build checked in headless Chromium (CSP, no third-party requests), edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
+Locally verified: backend migrations/check/47 tests/ruff, Flutter analyze/68 tests, web release build checked in headless Chromium (CSP, no third-party requests), edge Worker 11 tests, live Vercel deployment checks, release APK, real-font screenshots, debug APK build with merged-manifest inspection, live API smoke test. NOT yet verified: release APK (Maven Central rate limiting locally; CI builds and checks it), device run, TalkBack, GitHub Actions (account billing lock). Exact commands and outcomes live in `docs/HANDOFF.md`; rerun before claiming anything is tested.
 
 ## Next PRs (suggested sequence)
 
 1. ~~CI + build correctness~~ (PR #1). Remaining: CI green on GitHub and an APK build.
 2. ~~Mobile polish~~ (PR #2). Remaining: native-speaker Kiswahili review, TalkBack pass on a device.
-3. **Trustable listings**: time-limited verification, provenance rules, reviewer and revoke are done (PR #2). Remaining: two-person review for support providers, user-facing "report a problem", first real verified entries for one pilot county.
+3. **Trustable listings**: time-limited verification, provenance rules, reviewer and revoke are done (PR #2). Report-a-problem and first real listings (desk-checked, 109 records) shipped in v0.2. Remaining: two-person review for support providers, phone re-verification with a pilot county's partners.
 4. **User research**: pilot with a local NGO and users in one county, measure time to verified action. NO patient-level data.
 5. **Partner portal**: build only after legal/clinical reviews and signed pilot with explicit privacy/consent requirements.
 
@@ -72,8 +74,8 @@ See `docs/DECISIONS.md`. Especially: Android first, guest-first, public verified
 
 ## Pending features and GitHub delivery queue (2026-10-18)
 
-- **Draft PR #7** (`feature/private-application-tracker`): encrypted Android application status tracking with migration. It is intentionally **unmerged and untested in Flutter**; run gen-l10n, analyzer, tests, and device smoke test before merging. Review the goal-vault reset wording because goals and application records share a key.
-- **Issue #8:** verified listings, guest pilot UX, suspicious-listing report, accessibility.
+- **PR #7** (application tracker): merged 2026-10-18 at the owner's request after Flutter validation (gen-l10n, analyze, tests). Still needs a device smoke test of the legacy goal migration. Goals and application records share one vault key, so "reset" deletes both.
+- **Issue #8:** partly done in v0.2 (PR #8 branch `claude/real-data-ux`): first real listings (desk-checked), details view, welcome screen, anonymous report flow with moderation queue. Still open: real-device/TalkBack test, pilot-county partner verification, privacy notice and complaint contact, native-speaker Kiswahili.
 - **Issue #9:** goal subtasks, reminders, CV builder, skills/financial modules.
 - **Issue #10:** addiction support and consented referrals, blocked on clinical/privacy review.
 - **Issue #11:** NGO partner dashboard and billing, blocked on partner agreements/security reviews.
