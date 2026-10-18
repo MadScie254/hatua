@@ -295,7 +295,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get settingsPrivacyBody =>
-      'Malengo huhifadhiwa kwenye hifadhi iliyosimbwa ya kifaa na hayajumuishwi kwenye nakala rudufu. Taarifa za orodha ya umma zinaweza kuhifadhiwa kwa hadi saa 24 kwa matumizi nje ya mtandao. Hakuna historia ya matibabu inayokusanywa.';
+      'Malengo binafsi na maombi yanayofuatiliwa husimbwa kwenye Android, hubaki kwenye simu na hayapo kwenye nakala rudufu. Data ya umma hukaa hadi saa 24. Hakuna historia ya matibabu inayokusanywa.';
 
   @override
   String get settingsLanguageTitle => 'Lugha';
@@ -318,14 +318,14 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get settingsDeleteBody =>
-      'Ondoa matangazo yaliyohifadhiwa, malengo, mapendeleo na orodha zilizohifadhiwa.';
+      'Ondoa malengo, maombi yanayofuatiliwa, fursa na mapendeleo.';
 
   @override
   String get settingsDeleteConfirmTitle => 'Futa data ya kifaa?';
 
   @override
   String get settingsDeleteConfirmBody =>
-      'Hii itaondoa kabisa malengo, fursa zilizohifadhiwa, mapendeleo na matangazo ya umma yaliyohifadhiwa kwenye kifaa hiki.';
+      'Hii itafuta malengo, maombi yanayofuatiliwa, fursa zilizohifadhiwa, mapendeleo na data ya umma.';
 
   @override
   String get settingsDeleted => 'Data ya programu kwenye kifaa imefutwa.';
@@ -357,7 +357,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get planResetConfirmBody =>
-      'Hii itafuta malengo yaliyohifadhiwa na ufunguo uliyoyalinda, kisha itaanza upya.';
+      'Hii itafuta malengo ya faragha na maombi unayofuatilia kwa pamoja.';
 
   @override
   String get reset => 'Weka upya';
@@ -371,9 +371,54 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get planUnsupportedBody =>
-      'Malengo binafsi husimbwa kwa kutumia maunzi salama ya simu yako. Vivinjari haviwezi kutoa ulinzi huo, kwa hivyo toleo hili la wavuti halihifadhi malengo. Sehemu nyingine zote zinafanya kazi hapa.';
+      'Malengo binafsi na ufuatiliaji wa maombi vinahitaji hifadhi salama ya Android. Toleo hili la wavuti halihifadhi hivyo.';
 
   @override
   String get settingsPrivacyBodyNoGoals =>
-      'Toleo hili la wavuti halihifadhi malengo. Orodha ulizohifadhi, kaunti yako na lugha yako huhifadhiwa kwenye kivinjari hiki pekee, na taarifa za orodha ya umma kwa hadi saa 24. Hakuna kinachopakiwa na hakuna historia ya matibabu inayokusanywa.';
+      'Toleo hili la wavuti halihifadhi malengo wala ufuatiliaji wa maombi. Fursa zilizohifadhiwa, kaunti, lugha na data ya umma hukaa kwenye kivinjari hiki. Hakuna historia ya matibabu inayokusanywa.';
+
+  @override
+  String get exploreTrack => 'Fuatilia ombi';
+
+  @override
+  String get exploreTracked => 'Linafuatiliwa kwenye Mpango';
+
+  @override
+  String get exploreTrackAdded => 'Limeongezwa kwenye Mpango.';
+
+  @override
+  String get exploreTrackAndroidOnly =>
+      'Ufuatiliaji binafsi unahitaji hifadhi salama ya Android.';
+
+  @override
+  String get planApplicationsTitle => 'Maombi yangu';
+
+  @override
+  String get planApplicationsIntro =>
+      'Fuatilia hatua kwa faragha. Kufungua kiungo si kutuma ombi.';
+
+  @override
+  String get planApplicationsEmpty =>
+      'Bado hakuna ombi linalofuatiliwa. Ongeza kutoka Fursa.';
+
+  @override
+  String get planApplicationStatus => 'Hatua ya ombi';
+
+  @override
+  String get planApplicationRemove => 'Ondoa ombi';
+
+  @override
+  String get applicationStageInterested => 'Ninavutiwa';
+
+  @override
+  String get applicationStageApplied => 'Nimetuma ombi';
+
+  @override
+  String get applicationStageInterview => 'Mahojiano';
+
+  @override
+  String get applicationStageOffered => 'Nimepata ofa';
+
+  @override
+  String get applicationStageClosed => 'Limefungwa';
 }

@@ -17,14 +17,14 @@ Legend: **S** = starter source implemented (still uncompiled here); **P1** = pil
 | Search/filter | S | On-device text, county, category/kind filters; server filters exist |
 | Opportunity detail | S | Summary/card with eligibility, official links |
 | Saved opportunities | S | On-device bookmark + saved filter |
-| Application tracking | P2 | No application collection in MVP |
+| Application tracking | FEATURE BRANCH (Android) | Interested / applied / interview / offered / closed, stored only inside encrypted goal vault; web disabled; pending tests before merge |
 | Support home | S | NACADA 1192 dialer shortcut |
 | Emergency help | S (copy only) | Card above the directory, offline-safe; no numbers until professionally verified |
 | Support directory | S | Kind chips, county filter, last-checked date; no real entries yet |
 | Support provider detail | S | In-card details, external contact |
 | Confidential referrals | BLOCKED | Consent architecture, provider onboarding, law |
 | Wellbeing check-in | BLOCKED | Health data and clinical safeguards |
-| Personal goals | S | Encrypted on-device goal checklist |
+| Personal goals | S | Encrypted on-device goal checklist; v1 goal-only payloads migrate to a v2 envelope when private data is next saved |
 | Goal details/subtasks | P2 | Flat goals only currently |
 | Notifications | P2 | Device permission not requested currently |
 | Profile/settings | S | Guest status, privacy copy, local data deletion |
@@ -52,3 +52,7 @@ Legend: **S** = starter source implemented (still uncompiled here); **P1** = pil
 7. Saved listings do not accidentally reveal sensitive recovery status.
 8. Any external links open only http/https URLs, not arbitrary app-specific schemes from remote payloads.
 9. No cash collection, advertising, automated health advice or medical/rehab partner promises.
+
+10. Tracking a listing must require an explicit tap; opening a source URL alone never means an application was submitted.
+11. Android application records are encrypted with the private goals, never put in public directory caches, and never shared with an employer.
+12. A vault failure disables tracking and goals but leaves public browsing and support resources available.

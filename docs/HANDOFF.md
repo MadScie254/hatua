@@ -121,3 +121,20 @@ flutter test tool/screenshots/screenshots_test.dart --dart-define=SHOTS_DIR=$PWD
 ## Important project boundaries (unchanged)
 
 HATUA is not a diagnostic, therapy or medical device, a crisis-response service, a job-placement guarantee, or a lending product. Essential assistance stays free. Never share support-seeking with employers. Keep human oversight of referral and moderation decisions. Update this file after every PR with date, branch/commit, the commands run and their outcomes, and the next action. Never write "all tested" without command output.
+
+## 2026-10-18 proposed feature branch: private application tracker
+
+Branch: `feature/private-application-tracker`. Adds an Android-only application tracker in Explore and My Plan, statuses `interested`, `applied`, `interview`, `offered`, `closed`. **Only a deliberate user action adds or updates a record; simply opening an application link never changes its status.** The entries live in the same encrypted GoalVault ciphertext (v2 object envelope); older goal-only encrypted lists are read without data loss and rewritten on next private change. This retains no recovery information and adds no backend data collection, permissions or external analytics. When the vault is unsupported (Flutter web), tracking is disabled.
+
+Resetting private goals must also delete tracked applications because the key is shared; UI copy was updated. Added unit tests for migration, persistence, duplicate prevention, encryption failure and unsupported platforms. **Validation pending: Flutter SDK unavailable to the editing session, GitHub Actions blocked by billing lock. Do not merge until `flutter gen-l10n`, `flutter analyze`, `flutter test` and an Android smoke test pass.**
+
+### Feature queue for incoming coding assistants
+
+- Draft PR #7: https://github.com/MadScie254/hatua/pull/7 (pending Flutter validation)
+- Verified pilot UX and scam reporting: https://github.com/MadScie254/hatua/issues/8
+- Goals/CV/education/financial tools: https://github.com/MadScie254/hatua/issues/9
+- Recovery support and referral safeguards: https://github.com/MadScie254/hatua/issues/10
+- NGO partner/billing: https://github.com/MadScie254/hatua/issues/11
+- Optional AI: https://github.com/MadScie254/hatua/issues/12
+
+No feature from this branch is on `main` until PR #7 has been tested, reviewed and merged. Existing production sites are unchanged.

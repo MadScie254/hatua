@@ -121,6 +121,7 @@ void main() {
     expect(prefs.getKeys(), isEmpty);
     expect(vault.deleteCalls, 1);
     expect(store.goals, isEmpty);
+    expect(store.applications, isEmpty);
     expect(store.isSaved('o1'), isFalse);
     expect(store.county, isNull);
     expect(store.languageCode, isNull);

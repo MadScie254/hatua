@@ -66,6 +66,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
     }
   }
 
+  Future<void> _track(Opportunity opportunity) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await widget.store.trackOpportunity(opportunity);
+      if (mounted) messenger.showSnackBar(SnackBar(content: Text(l10n.exploreTrackAdded)));
+    } catch (_) {
+      if (mounted) messenger.showSnackBar(SnackBar(content: Text(l10n.planSaveFailed)));
+    }
+  }
+
   void _clearFilters() {
     _search.clear();
     widget.store.setCounty(null);
@@ -147,6 +158,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 opportunity: op,
                 saved: store.isSaved(op.id),
                 onToggleSaved: () => store.toggleBookmark(op.id),
+                tracked: store.isTracked(op.id),
+                canTrack: store.goalsStatus == GoalsStatus.ready,
+                onTrack: _track,
                 onOpen: _openUrl,
               ),
         ],
@@ -160,12 +174,18 @@ class _OpportunityCard extends StatelessWidget {
     required this.opportunity,
     required this.saved,
     required this.onToggleSaved,
+    required this.tracked,
+    required this.canTrack,
+    required this.onTrack,
     required this.onOpen,
   });
 
   final Opportunity opportunity;
   final bool saved;
   final VoidCallback onToggleSaved;
+  final bool tracked;
+  final bool canTrack;
+  final ValueChanged<Opportunity> onTrack;
   final ValueChanged<String> onOpen;
 
   @override
@@ -225,6 +245,17 @@ class _OpportunityCard extends StatelessWidget {
               ),
             if (op.sourceUrl.isNotEmpty)
               OutlinedButton(onPressed: () => onOpen(op.sourceUrl), child: Text(l10n.verifySource)),
+            if (tracked)
+              Chip(label: Text(l10n.exploreTracked))
+            else
+              Tooltip(
+                message: canTrack ? l10n.exploreTrack : l10n.exploreTrackAndroidOnly,
+                child: OutlinedButton.icon(
+                  onPressed: canTrack ? () => onTrack(op) : null,
+                  icon: const Icon(Icons.playlist_add_check),
+                  label: Text(l10n.exploreTrack),
+                ),
+              ),
           ]),
         ]),
       ),

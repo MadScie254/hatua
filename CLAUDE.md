@@ -22,7 +22,7 @@ You are continuing **HATUA**, a Kenya-first Android product for verified economi
 - `backend/directory/views.py`: GET-only public endpoints sharing one `PublicDirectoryList` base.
 - `backend/directory/admin.py`: staff curation with state filter, reviewer recording and "Revoke now"; not a partner dashboard.
 - Mobile `CatalogRepository`: read-only API, 24h public offline copy, https-only in release, reports network/cache/unavailable.
-- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
+- Mobile `LocalStore`: opportunity bookmarks, county and language prefs (SharedPreferences) + goals AND local application statuses encrypted by our own Android Keystore AES-GCM vault (`GoalVault.kt` + `lib/src/data/goal_vault.dart`, channel `hatua/goal_vault`). A vault failure must only disable My Plan, never block the app. Support resources are never bookmarked.
 - Web: `mobile/web/` (branding, loading page with 1192, `flutter_bootstrap.js`), `mobile/vercel.json` (CSP, `/api` rewrite), `mobile/tool/web_*.sh`. On the web `CatalogRepository` calls its own origin and `GoalVault.isSupported` is false (My Plan off). Keep the build free of third-party requests (`--no-web-resources-cdn`, `tool/check_web_build.sh`).
 - Mobile strings: `mobile/lib/l10n/app_en.arb` (template) and `app_sw.arb` (**draft** Kiswahili). Never hard-code UI text; run `flutter gen-l10n` and commit the generated files.
 
@@ -69,3 +69,14 @@ See `docs/DECISIONS.md`. Especially: Android first, guest-first, public verified
 ## Copy-paste continuation prompt
 
 > Read `CLAUDE.md`, `README.md`, `docs/HANDOFF.md`, `docs/ROADMAP.md` and `docs/SAFETY_PRIVACY.md`. Inspect the repo rather than assuming code is tested. First bootstrap Flutter Android platform, install backend deps, run the specified tests/static analysis/migration check, and fix issues. Commit changes in small coherent commits. Keep guest access, verified-only publication, and recovery-data isolation. Report exactly what passed, what failed, any safety/security concerns, and update `docs/HANDOFF.md` so another assistant can take over.
+
+## Pending features and GitHub delivery queue (2026-10-18)
+
+- **Draft PR #7** (`feature/private-application-tracker`): encrypted Android application status tracking with migration. It is intentionally **unmerged and untested in Flutter**; run gen-l10n, analyzer, tests, and device smoke test before merging. Review the goal-vault reset wording because goals and application records share a key.
+- **Issue #8:** verified listings, guest pilot UX, suspicious-listing report, accessibility.
+- **Issue #9:** goal subtasks, reminders, CV builder, skills/financial modules.
+- **Issue #10:** addiction support and consented referrals, blocked on clinical/privacy review.
+- **Issue #11:** NGO partner dashboard and billing, blocked on partner agreements/security reviews.
+- **Issue #12:** optional low-cost AI search/matching, never using recovery data.
+
+Take one reviewed PR at a time; do not mark issues as implemented. GitHub Actions still needs billing lock resolved. Changes to `main` deploy to production.

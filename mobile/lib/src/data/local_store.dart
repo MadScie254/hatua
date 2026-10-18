@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/application_record.dart';
 import '../models/goal.dart';
+import '../models/opportunity.dart';
 import 'catalog_repository.dart';
 import 'counties.dart';
 import 'goal_vault.dart';
@@ -14,7 +16,8 @@ enum GoalsStatus { ready, unavailable, unsupported }
 
 /// Everything HATUA keeps on the device. Nothing here is sent to the backend.
 ///
-/// - Goal titles: encrypted by [GoalVault] (Android Keystore AES-GCM); only ciphertext is stored.
+/// - Private goals and employment application tracker: encrypted by [GoalVault].
+///   Previous goal-only ciphertext lists are migrated on the next write.
 /// - Bookmarks (public listing IDs), chosen county and language: plain SharedPreferences.
 ///   None of these reveal recovery status: bookmarks are only kept for opportunities,
 ///   never for support resources.
@@ -24,6 +27,7 @@ enum GoalsStatus { ready, unavailable, unsupported }
 class LocalStore extends ChangeNotifier {
   LocalStore({GoalVault? vault}) : _vault = vault ?? const PlatformGoalVault();
 
+  // Keep the v1 preference key so existing encrypted goals survive the v2 envelope upgrade.
   static const goalsKey = 'hatua.goals.enc.v1';
   static const savedKey = 'hatua.saved.opportunities.v1';
   static const countyKey = 'hatua.prefs.county.v1';
@@ -34,6 +38,7 @@ class LocalStore extends ChangeNotifier {
   final GoalVault _vault;
 
   List<Goal> _goals = [];
+  List<ApplicationRecord> _applications = [];
   GoalsStatus _goalsStatus = GoalsStatus.ready;
   String? _goalsError;
   Set<String> _savedIds = {};
@@ -41,6 +46,9 @@ class LocalStore extends ChangeNotifier {
   String? _languageCode;
 
   List<Goal> get goals => List.unmodifiable(_goals);
+  List<ApplicationRecord> get applications => List.unmodifiable(_applications);
+  bool isTracked(String opportunityId) =>
+      _applications.any((record) => record.opportunityId == opportunityId);
   GoalsStatus get goalsStatus => _goalsStatus;
 
   /// Technical reason goals are unavailable (exception type and message, no goal text).
@@ -82,6 +90,7 @@ class LocalStore extends ChangeNotifier {
       // A broken key that cannot be deleted will surface again on the next save.
     }
     _goals = [];
+    _applications = [];
     _goalsStatus = _vault.isSupported ? GoalsStatus.ready : GoalsStatus.unsupported;
     _goalsError = null;
     notifyListeners();
@@ -89,6 +98,7 @@ class LocalStore extends ChangeNotifier {
 
   Future<void> _loadGoals(SharedPreferences prefs) async {
     if (!_vault.isSupported) {
+      _applications = [];
       _goals = [];
       _goalsStatus = GoalsStatus.unsupported;
       _goalsError = null;
@@ -96,17 +106,40 @@ class LocalStore extends ChangeNotifier {
     }
     final blob = prefs.getString(goalsKey);
     if (blob == null) {
+      _applications = [];
       _goals = [];
       _goalsStatus = GoalsStatus.ready;
       _goalsError = null;
       return;
     }
     try {
-      final raw = jsonDecode(await _vault.decrypt(blob)) as List<dynamic>;
-      _goals = raw.map((v) => Goal.fromJson(Map<String, dynamic>.from(v as Map))).toList();
+      final decoded = jsonDecode(await _vault.decrypt(blob));
+      // v1 saved only a JSON list of Goal records. v2 stores an envelope that
+      // keeps private goals and the application tracker in one encrypted blob.
+      final List<dynamic> goalsRaw;
+      final List<dynamic> applicationsRaw;
+      if (decoded is List) {
+        goalsRaw = decoded;
+        applicationsRaw = const [];
+      } else if (decoded is Map && decoded['version'] == 2 &&
+          decoded['goals'] is List && decoded['applications'] is List) {
+        goalsRaw = decoded['goals'] as List<dynamic>;
+        applicationsRaw = decoded['applications'] as List<dynamic>;
+      } else {
+        throw const FormatException('Unsupported private data version');
+      }
+      final goals = goalsRaw
+          .map((v) => Goal.fromJson(Map<String, dynamic>.from(v as Map)))
+          .toList();
+      final applications = applicationsRaw
+          .map((v) => ApplicationRecord.fromJson(Map<String, dynamic>.from(v as Map)))
+          .toList();
+      _goals = goals;
+      _applications = applications;
       _goalsStatus = GoalsStatus.ready;
       _goalsError = null;
     } catch (e) {
+      _applications = [];
       _goals = [];
       _goalsStatus = GoalsStatus.unavailable;
       _goalsError = e is GoalVaultException ? e.detail : e.runtimeType.toString();
@@ -146,19 +179,47 @@ class LocalStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// A visit to an application URL is NOT evidence of submission.
+  Future<void> trackOpportunity(Opportunity opportunity) {
+    if (_goalsStatus != GoalsStatus.ready) {
+      throw StateError('Private tracking is unavailable on this device');
+    }
+    if (isTracked(opportunity.id)) return Future.value();
+    return _commitPrivate(
+      applications: [..._applications, ApplicationRecord.fromOpportunity(opportunity, DateTime.now())],
+    );
+  }
+
+  Future<void> updateApplicationStage(String id, ApplicationStage stage) {
+    if (!isTracked(id)) return Future.value();
+    return _commitPrivate(
+      applications: [
+        for (final record in _applications)
+          record.opportunityId == id
+              ? record.copyWith(stage: stage, updatedAt: DateTime.now().toUtc())
+              : record,
+      ],
+    );
+  }
+
+  Future<void> removeApplication(String id) =>
+      _commitPrivate(applications: _applications.where((r) => r.opportunityId != id).toList());
+
   Future<void> addGoal(String title) async {
     final clean = title.trim();
     if (clean.isEmpty || clean.length > maxGoalLength) return;
-    await _commitGoals([
-      ..._goals,
-      Goal(id: DateTime.now().microsecondsSinceEpoch.toString(), title: clean, isDone: false),
-    ]);
+    await _commitPrivate(
+      goals: [
+        ..._goals,
+        Goal(id: DateTime.now().microsecondsSinceEpoch.toString(), title: clean, isDone: false),
+      ],
+    );
   }
 
   Future<void> toggleGoal(String id) =>
-      _commitGoals(_goals.map((g) => g.id == id ? g.copyWith(isDone: !g.isDone) : g).toList());
+      _commitPrivate(goals: _goals.map((g) => g.id == id ? g.copyWith(isDone: !g.isDone) : g).toList());
 
-  Future<void> removeGoal(String id) => _commitGoals(_goals.where((g) => g.id != id).toList());
+  Future<void> removeGoal(String id) => _commitPrivate(goals: _goals.where((g) => g.id != id).toList());
 
   /// Removes every HATUA value from this device: goals and their key, bookmarks, preferences, caches.
   Future<void> clearAll() async {
@@ -167,6 +228,7 @@ class LocalStore extends ChangeNotifier {
       await prefs.remove(key);
     }
     _goals = [];
+    _applications = [];
     _goalsStatus = _vault.isSupported ? GoalsStatus.ready : GoalsStatus.unsupported;
     _goalsError = null;
     _savedIds.clear();
@@ -180,15 +242,23 @@ class LocalStore extends ChangeNotifier {
     }
   }
 
-  /// Encrypts and stores [next]; the in-memory list changes only if the write succeeded.
-  Future<void> _commitGoals(List<Goal> next) async {
+  /// Atomically encrypts both sets of private records. No plaintext in preferences.
+  /// In-memory state updates only after successful encryption and persistence.
+  Future<void> _commitPrivate({List<Goal>? goals, List<ApplicationRecord>? applications}) async {
     if (_goalsStatus != GoalsStatus.ready) {
-      throw StateError('Goals are unavailable on this device');
+      throw StateError('Private storage is unavailable on this device');
     }
-    final blob = await _vault.encrypt(jsonEncode(next.map((g) => g.toJson()).toList()));
+    final nextGoals = goals ?? _goals;
+    final nextApplications = applications ?? _applications;
+    final blob = await _vault.encrypt(jsonEncode({
+      'version': 2,
+      'goals': nextGoals.map((g) => g.toJson()).toList(),
+      'applications': nextApplications.map((a) => a.toJson()).toList(),
+    }));
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(goalsKey, blob);
-    _goals = next;
+    if (!await prefs.setString(goalsKey, blob)) throw StateError('Private storage write failed');
+    _goals = nextGoals;
+    _applications = nextApplications;
     notifyListeners();
   }
 }

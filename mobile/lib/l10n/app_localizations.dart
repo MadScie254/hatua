@@ -605,7 +605,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacyBody.
   ///
   /// In en, this message translates to:
-  /// **'Goals are stored in encrypted device storage and excluded from backups. Public directory data may be kept for up to 24 hours for offline use. No medical history is collected.'**
+  /// **'Private goals and tracked applications are encrypted on Android, stay on this device and are excluded from backups. Public directory copies last up to 24 hours. No medical history is collected.'**
   String get settingsPrivacyBody;
 
   /// No description provided for @settingsLanguageTitle.
@@ -647,7 +647,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Remove saved listings, goals, preferences and cached directories.'**
+  /// **'Remove private goals, tracked applications, saved listings and preferences.'**
   String get settingsDeleteBody;
 
   /// No description provided for @settingsDeleteConfirmTitle.
@@ -659,7 +659,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDeleteConfirmBody.
   ///
   /// In en, this message translates to:
-  /// **'This permanently removes goals, saved opportunities, preferences and cached public listings from this device.'**
+  /// **'This permanently removes goals, tracked applications, saved listings, preferences and cached public data.'**
   String get settingsDeleteConfirmBody;
 
   /// No description provided for @settingsDeleted.
@@ -713,7 +713,7 @@ abstract class AppLocalizations {
   /// No description provided for @planResetConfirmBody.
   ///
   /// In en, this message translates to:
-  /// **'This deletes any saved goals and the key that protected them, then starts fresh.'**
+  /// **'This deletes your private goals and tracked applications together.'**
   String get planResetConfirmBody;
 
   /// No description provided for @reset.
@@ -737,14 +737,98 @@ abstract class AppLocalizations {
   /// No description provided for @planUnsupportedBody.
   ///
   /// In en, this message translates to:
-  /// **'Private goals are encrypted with your phone\'s secure hardware. Browsers cannot offer that protection, so this web version does not store goals. Everything else works here.'**
+  /// **'Private goals and application tracking need Android secure storage. This web version does not store either. Other features still work here.'**
   String get planUnsupportedBody;
 
   /// Privacy summary on platforms without secure goal storage (the web build).
   ///
   /// In en, this message translates to:
-  /// **'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
+  /// **'This web version does not store goals or application tracking. Saved listings, your county and language are kept in this browser, alongside public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.'**
   String get settingsPrivacyBodyNoGoals;
+
+  /// No description provided for @exploreTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Track application'**
+  String get exploreTrack;
+
+  /// No description provided for @exploreTracked.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracked in My Plan'**
+  String get exploreTracked;
+
+  /// No description provided for @exploreTrackAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to My Plan.'**
+  String get exploreTrackAdded;
+
+  /// No description provided for @exploreTrackAndroidOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Private tracking requires secure storage on Android.'**
+  String get exploreTrackAndroidOnly;
+
+  /// No description provided for @planApplicationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My applications'**
+  String get planApplicationsTitle;
+
+  /// No description provided for @planApplicationsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Track progress privately. Opening a link is not an application.'**
+  String get planApplicationsIntro;
+
+  /// No description provided for @planApplicationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing tracked yet. Add a listing from Explore.'**
+  String get planApplicationsEmpty;
+
+  /// No description provided for @planApplicationStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Application progress'**
+  String get planApplicationStatus;
+
+  /// No description provided for @planApplicationRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove application'**
+  String get planApplicationRemove;
+
+  /// No description provided for @applicationStageInterested.
+  ///
+  /// In en, this message translates to:
+  /// **'Interested'**
+  String get applicationStageInterested;
+
+  /// No description provided for @applicationStageApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied'**
+  String get applicationStageApplied;
+
+  /// No description provided for @applicationStageInterview.
+  ///
+  /// In en, this message translates to:
+  /// **'Interview'**
+  String get applicationStageInterview;
+
+  /// No description provided for @applicationStageOffered.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer received'**
+  String get applicationStageOffered;
+
+  /// No description provided for @applicationStageClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get applicationStageClosed;
 }
 
 class _AppLocalizationsDelegate

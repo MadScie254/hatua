@@ -294,7 +294,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacyBody =>
-      'Goals are stored in encrypted device storage and excluded from backups. Public directory data may be kept for up to 24 hours for offline use. No medical history is collected.';
+      'Private goals and tracked applications are encrypted on Android, stay on this device and are excluded from backups. Public directory copies last up to 24 hours. No medical history is collected.';
 
   @override
   String get settingsLanguageTitle => 'Language';
@@ -317,14 +317,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDeleteBody =>
-      'Remove saved listings, goals, preferences and cached directories.';
+      'Remove private goals, tracked applications, saved listings and preferences.';
 
   @override
   String get settingsDeleteConfirmTitle => 'Delete local data?';
 
   @override
   String get settingsDeleteConfirmBody =>
-      'This permanently removes goals, saved opportunities, preferences and cached public listings from this device.';
+      'This permanently removes goals, tracked applications, saved listings, preferences and cached public data.';
 
   @override
   String get settingsDeleted => 'Local app data cleared.';
@@ -355,7 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planResetConfirmBody =>
-      'This deletes any saved goals and the key that protected them, then starts fresh.';
+      'This deletes your private goals and tracked applications together.';
 
   @override
   String get reset => 'Reset';
@@ -368,9 +368,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planUnsupportedBody =>
-      'Private goals are encrypted with your phone\'s secure hardware. Browsers cannot offer that protection, so this web version does not store goals. Everything else works here.';
+      'Private goals and application tracking need Android secure storage. This web version does not store either. Other features still work here.';
 
   @override
   String get settingsPrivacyBodyNoGoals =>
-      'This web version does not store goals. Saved listings, your county and your language are kept in this browser only, and public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.';
+      'This web version does not store goals or application tracking. Saved listings, your county and language are kept in this browser, alongside public directory data for up to 24 hours. Nothing is uploaded and no medical history is collected.';
+
+  @override
+  String get exploreTrack => 'Track application';
+
+  @override
+  String get exploreTracked => 'Tracked in My Plan';
+
+  @override
+  String get exploreTrackAdded => 'Added to My Plan.';
+
+  @override
+  String get exploreTrackAndroidOnly =>
+      'Private tracking requires secure storage on Android.';
+
+  @override
+  String get planApplicationsTitle => 'My applications';
+
+  @override
+  String get planApplicationsIntro =>
+      'Track progress privately. Opening a link is not an application.';
+
+  @override
+  String get planApplicationsEmpty =>
+      'Nothing tracked yet. Add a listing from Explore.';
+
+  @override
+  String get planApplicationStatus => 'Application progress';
+
+  @override
+  String get planApplicationRemove => 'Remove application';
+
+  @override
+  String get applicationStageInterested => 'Interested';
+
+  @override
+  String get applicationStageApplied => 'Applied';
+
+  @override
+  String get applicationStageInterview => 'Interview';
+
+  @override
+  String get applicationStageOffered => 'Offer received';
+
+  @override
+  String get applicationStageClosed => 'Closed';
 }
